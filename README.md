@@ -30,16 +30,16 @@ Bonfire is a social media platform where users can post, react, and comment in c
 2. Change directory:
    `cd Bonfire`
 
-3. Set up virtual environment and install dependencies:
-   `python3 setup.py`
+3. Create a database for each service.
 
-4. Create a database for each service:
-
-5. Create environment file and add database URL for each service:
+4. Create environment file and add database URL for each service.
 
    1. Create `.env` file and copy contents from `.env.example`
    2. Update `DATABASE_URL` with the respective URL for that service.
    3. Database URL should follow this format: `postgresql://[username]:[password]@[host]:[port]/[database_name]`
+
+5. Set up virtual environment, install dependencies, and apply migrations:
+   `python3 setup.py`
 
 6. Run the services and web app:
    `python3 run.py`

@@ -7,19 +7,22 @@ from pathlib import Path
 processes = []
 running = True
 
+
 def get_python_path(service_path):
     service_path = service_path.resolve()
     if sys.platform == 'win32':
         return service_path / '.venv' / 'Scripts' / 'python.exe'
     return service_path / '.venv' / 'bin' / 'python'
 
+
 def run_django_service(service_path):
     python_path = get_python_path(service_path)
     if not python_path.exists():
-        print(f"Virtual environment not found for {service_path.name}. Please run setup script first.")
+        print(f"Virtual environment not found for {
+              service_path.name}. Please run setup script first.")
         print(f"Looking for Python at: {python_path}")
         return None
-        
+
     process = subprocess.Popen(
         [str(python_path), str(service_path / 'manage.py'), 'runserver'],
         cwd=str(service_path),
@@ -27,19 +30,21 @@ def run_django_service(service_path):
     )
     return process
 
+
 def run_nextjs():
     root_dir = Path(__file__).parent.resolve()
     web_dir = root_dir / 'web'
     if not web_dir.exists():
         print("Web directory not found")
         return None
-        
+
     process = subprocess.Popen(
         ['npm', 'run', 'dev'],
         cwd=str(web_dir),
         env=os.environ.copy()
     )
     return process
+
 
 def cleanup():
     for process in processes:
@@ -50,6 +55,7 @@ def cleanup():
                 process.terminate()
             process.wait()
 
+
 def signal_handler(signum, frame):
     global running
     print("\nShutting down all services...")
@@ -57,11 +63,12 @@ def signal_handler(signum, frame):
     cleanup()
     sys.exit(0)
 
+
 def main():
     global running
     root_dir = Path(__file__).parent.resolve()
     services_dir = root_dir / 'services'
-    
+
     if not services_dir.exists():
         print(f"Services directory not found at: {services_dir}")
         return
@@ -72,7 +79,7 @@ def main():
     for service_dir in services_dir.iterdir():
         if not service_dir.is_dir():
             continue
-            
+
         if (service_dir / 'manage.py').exists():
             print(f"Starting {service_dir.name}...")
             print(f"Service directory: {service_dir.resolve()}")
@@ -101,6 +108,7 @@ def main():
                 time.sleep(1)
 
     cleanup()
+
 
 if __name__ == '__main__':
     main()
