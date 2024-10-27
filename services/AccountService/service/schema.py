@@ -2,10 +2,12 @@ import graphene
 import graphql_jwt
 from django.contrib.auth import get_user_model
 from graphene_django import DjangoObjectType
+from graphene_federation import LATEST_VERSION, build_schema, key
 from graphql_jwt.decorators import login_required
 from graphql_jwt.shortcuts import create_refresh_token, get_token
 
 
+@key("id")
 class UserType(DjangoObjectType):
     class Meta:
         model = get_user_model()
@@ -51,4 +53,5 @@ class Mutation(graphene.ObjectType):
     refresh_token = graphql_jwt.Refresh.Field()
 
 
-schema = graphene.Schema(query=Query, mutation=Mutation)
+schema = build_schema(query=Query, mutation=Mutation,
+                      federation_version=LATEST_VERSION)
