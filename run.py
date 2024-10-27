@@ -46,6 +46,21 @@ def run_nextjs():
     return process
 
 
+def run_gateway():
+    root_dir = Path(__file__).parent.resolve()
+    gateway_dir = root_dir / 'gateway'
+    if not gateway_dir.exists():
+        print("Gateway directory not found")
+        return None
+
+    process = subprocess.Popen(
+        ['npm', 'run', 'start'],
+        cwd=str(gateway_dir),
+        env=os.environ.copy()
+    )
+    return process
+
+
 def cleanup():
     for process in processes:
         if process.poll() is None:
@@ -87,6 +102,12 @@ def main():
             if process:
                 processes.append(process)
                 print(f"Started {service_dir.name}")
+
+    print("Starting Apollo gateway...")
+    gateway_process = run_gateway()
+    if gateway_process:
+        processes.append(gateway_process)
+        print("Started Apollo gateway")
 
     print("Starting NextJS frontend...")
     frontend_process = run_nextjs()

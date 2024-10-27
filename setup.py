@@ -106,6 +106,18 @@ def setup_nextjs():
             raise
 
 
+def setup_gateway():
+    gateway_dir = Path('gateway')
+    if gateway_dir.exists():
+        try:
+            print("Setting up Apollo gateway dependencies...")
+            subprocess.run(['npm', 'install'], cwd=gateway_dir, check=True)
+            print("Successfully installed Apollo gateway dependencies")
+        except subprocess.CalledProcessError as e:
+            print(f"Error setting up Apollo gateway: {e}")
+            raise
+
+
 def main():
     try:
         check_python_version()
@@ -114,6 +126,8 @@ def main():
         if not services_dir.exists():
             print("Services directory not found")
             return
+
+        setup_gateway()
 
         setup_nextjs()
 
