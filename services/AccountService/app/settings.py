@@ -25,7 +25,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("SECRET_KEY") or 'django-insecure-@mskt3u2fhrj+_ak8^%nwu*y7^cmhlsk@klfh89xp9)i@ph)6c'
+SECRET_KEY = os.environ.get(
+    "SECRET_KEY") or 'django-insecure-@mskt3u2fhrj+_ak8^%nwu*y7^cmhlsk@klfh89xp9)i@ph)6c'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -42,21 +43,28 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
-    'corsheaders',
-    'service'
+    'service',
+    'graphene_django',
+    'graphql_jwt.refresh_token.apps.RefreshTokenConfig',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
 ]
+
+GRAPHENE = {
+    "SCHEMA": "service.schema.schema",
+    "MIDDLEWARE": [
+        "graphql_jwt.middleware.JSONWebTokenMiddleware",
+    ],
+}
 
 ROOT_URLCONF = 'app.urls'
 
@@ -115,6 +123,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = 'service.User'
+
+AUTHENTICATION_BACKENDS = [
+    "graphql_jwt.backends.JSONWebTokenBackend",
+    "django.contrib.auth.backends.ModelBackend",
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
