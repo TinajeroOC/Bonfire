@@ -41,8 +41,11 @@ Bonfire is a social media platform where users can post, react, and comment in c
 5. Set up virtual environment, install dependencies, and apply migrations:
    `python3 setup.py`
 
-6. Run the services and web app:
+6. Run services, gateway, and web app:
    `python3 run.py`
+
+> [!NOTE]
+> Run `npm run codegen` in the `web` directory whenever modifications are made to the underlying service APIs. This command generates type definitions that are up-to-date with the schema that the Apollo Server (the API gateway) is running queries against.
 
 ## Development on Windows
 
