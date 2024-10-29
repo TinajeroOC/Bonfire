@@ -2,6 +2,7 @@ import os
 import signal
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 processes = []
@@ -31,27 +32,14 @@ def run_django_service(service_path):
     return process
 
 
-def run_nextjs():
-    root_dir = Path(__file__).parent.resolve()
-    web_dir = root_dir / 'web'
-    if not web_dir.exists():
-        print("Web directory not found")
-        return None
-
-    process = subprocess.Popen(
-        ['npm', 'run', 'dev'],
-        cwd=str(web_dir),
-        env=os.environ.copy()
-    )
-    return process
-
-
 def run_gateway():
     root_dir = Path(__file__).parent.resolve()
     gateway_dir = root_dir / 'gateway'
     if not gateway_dir.exists():
         print("Gateway directory not found")
         return None
+
+    time.sleep(5)
 
     process = subprocess.Popen(
         ['npm', 'run', 'start'],
@@ -61,14 +49,39 @@ def run_gateway():
     return process
 
 
+def run_nextjs():
+    root_dir = Path(__file__).parent.resolve()
+    web_dir = root_dir / 'web'
+    if not web_dir.exists():
+        print("Web directory not found")
+        return None
+
+    process = subprocess.Popen(
+        ['npm', 'run', 'codegen'],
+        cwd=str(web_dir),
+        env=os.environ.copy()
+    )
+
+    process = subprocess.Popen(
+        ['npm', 'run', 'dev'],
+        cwd=str(web_dir),
+        env=os.environ.copy()
+    )
+    return process
+
+
 def cleanup():
     for process in processes:
-        if process.poll() is None:
-            if sys.platform == 'win32':
-                process.send_signal(signal.CTRL_C_EVENT)
-            else:
-                process.terminate()
-            process.wait()
+        if process and process.poll() is None:
+            try:
+                if sys.platform == 'win32':
+                    process.send_signal(signal.CTRL_C_EVENT)
+                else:
+                    process.terminate()
+                process.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.wait()
 
 
 def signal_handler(signum, frame):
@@ -94,7 +107,6 @@ def main():
     for service_dir in services_dir.iterdir():
         if not service_dir.is_dir():
             continue
-
         if (service_dir / 'manage.py').exists():
             print(f"Starting {service_dir.name}...")
             print(f"Service directory: {service_dir.resolve()}")
@@ -103,11 +115,15 @@ def main():
                 processes.append(process)
                 print(f"Started {service_dir.name}")
 
+    time.sleep(3)
+
     print("Starting Apollo gateway...")
     gateway_process = run_gateway()
     if gateway_process:
         processes.append(gateway_process)
         print("Started Apollo gateway")
+
+    time.sleep(3)
 
     print("Starting NextJS frontend...")
     frontend_process = run_nextjs()
@@ -125,7 +141,6 @@ def main():
             try:
                 signal.pause()
             except AttributeError:
-                import time
                 time.sleep(1)
 
     cleanup()
