@@ -5,14 +5,15 @@ import type { Metadata } from "next"
 
 import { ApolloProvider } from "@/components/providers/ApolloProvider"
 import { AuthProvider } from "@/components/providers/AuthProvider"
+import { siteConfig } from "@/config/site"
 
 interface RootLayoutProps {
   children: React.ReactNode
 }
 
 export const metadata: Metadata = {
-  title: "Bonfire",
-  description: "Gather around the Bonfire!",
+  title: siteConfig.name,
+  description: siteConfig.description,
 }
 
 export default function RootLayout({ children }: RootLayoutProps) {
