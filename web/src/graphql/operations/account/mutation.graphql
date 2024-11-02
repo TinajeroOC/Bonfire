@@ -1,18 +1,39 @@
-mutation CreateUser($email: String!, $password: String!, $username: String!) {
+mutation SignUp($email: String!, $password: String!, $username: String!) {
   createUser(email: $email, password: $password, username: $username) {
-    refreshToken
     token
+    refreshToken
     user {
       id
-      firstName
-      email
-      dateJoined
-      lastLogin
-      isSuperuser
-      lastName
-      isStaff
-      isActive
       username
+      email
     }
+  }
+}
+
+mutation SignIn($username: String!, $password: String!) {
+  tokenAuth(username: $username, password: $password) {
+    user {
+      id
+      username
+      email
+    }
+    token
+    payload
+    refreshToken
+    refreshExpiresIn
+  }
+}
+
+mutation RefreshToken($token: String!) {
+  refreshToken(token: $token) {
+    token
+    payload
+    refreshExpiresIn
+  }
+}
+
+mutation VerifyToken($token: String!) {
+  verifyToken(token: $token) {
+    payload
   }
 }

@@ -4,6 +4,7 @@ import { GeistSans } from "geist/font/sans"
 import type { Metadata } from "next"
 
 import { ApolloProvider } from "@/components/providers/ApolloProvider"
+import { AuthProvider } from "@/components/providers/AuthProvider"
 
 interface RootLayoutProps {
   children: React.ReactNode
@@ -18,7 +19,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" className={GeistSans.className}>
       <body>
-        <ApolloProvider>{children}</ApolloProvider>
+        <AuthProvider>
+          <ApolloProvider>{children}</ApolloProvider>
+        </AuthProvider>
       </body>
     </html>
   )
