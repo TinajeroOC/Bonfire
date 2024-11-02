@@ -5,6 +5,7 @@ import type { Metadata } from "next"
 
 import { ApolloProvider } from "@/components/providers/ApolloProvider"
 import { AuthProvider } from "@/components/providers/AuthProvider"
+import { ThemeProvider } from "@/components/providers/ThemeProvider"
 import { siteConfig } from "@/config/site"
 
 interface RootLayoutProps {
@@ -18,11 +19,13 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="en" className={GeistSans.className}>
+    <html lang="en" className={GeistSans.className} suppressHydrationWarning>
       <body>
-        <AuthProvider>
-          <ApolloProvider>{children}</ApolloProvider>
-        </AuthProvider>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <AuthProvider>
+            <ApolloProvider>{children}</ApolloProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   )
