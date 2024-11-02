@@ -14,6 +14,15 @@ class UserType(DjangoObjectType):
         exclude = ['password']
 
 
+class ObtainJSONWebToken(graphql_jwt.JSONWebTokenMutation):
+    refresh_token = graphene.NonNull(graphene.String)
+    user = graphene.NonNull(UserType)
+
+    @classmethod
+    def resolve(cls, root, info, **kwargs):
+        return cls(user=info.context.user, refresh_token=create_refresh_token(info.context.user))
+
+
 class CreateUser(graphene.Mutation):
     user = graphene.Field(UserType)
     token = graphene.String()
@@ -48,7 +57,7 @@ class Query(graphene.ObjectType):
 
 class Mutation(graphene.ObjectType):
     create_user = CreateUser.Field()
-    token_auth = graphql_jwt.ObtainJSONWebToken.Field()
+    token_auth = ObtainJSONWebToken.Field()
     verify_token = graphql_jwt.Verify.Field()
     refresh_token = graphql_jwt.Refresh.Field()
 
