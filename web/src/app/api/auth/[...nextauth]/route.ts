@@ -12,16 +12,17 @@ async function refreshAccessToken(nextAuthJWT: JWT): Promise<JWT> {
     const { data } = await getClient().mutate({
       mutation: RefreshTokenDocument,
       variables: {
-        token: nextAuthJWT.data.tokens.refresh,
+        refreshToken: nextAuthJWT.data.tokens.refresh,
       },
     })
 
     if (!data?.refreshToken) {
-      throw new Error("Unable to refresh token")
+      throw new Error("Unable to refresh access token")
     }
 
     nextAuthJWT.data.validity.validUntil = data.refreshToken.payload.exp
     nextAuthJWT.data.tokens.access = data.refreshToken.token
+    nextAuthJWT.data.tokens.refresh = data.refreshToken.refreshToken
 
     return nextAuthJWT
   } catch (error) {
