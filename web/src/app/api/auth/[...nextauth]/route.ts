@@ -116,6 +116,10 @@ export const authOptions: AuthOptions = {
       return session
     },
   },
+  pages: {
+    newUser: "/signup",
+    signIn: "/signin",
+  },
 }
 
 const handler = NextAuth(authOptions)
