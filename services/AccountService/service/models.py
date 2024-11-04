@@ -39,18 +39,11 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractUser):
-    username_validator = UnicodeUsernameValidator(
-        regex=r'[a-zA-Z0-9]+', message='Enter a valid username. Letters and digits only.')
-
     username = models.CharField(
         'username',
         max_length=20,
         unique=True,
-        help_text='Required. 20 characters or fewer. Letters and digits only.',
-        validators=[username_validator],
-        error_messages={
-            'unique': 'A user with that username already exists.',
-        },
+        validators=[UnicodeUsernameValidator(regex=r'[a-zA-Z0-9]+')],
     )
 
     email = models.EmailField(
@@ -58,9 +51,6 @@ class User(AbstractUser):
         max_length=255,
         null=False,
         unique=True,
-        error_messages={
-            'unique': 'A user with that email already exists.',
-        },
     )
 
     first_name = None

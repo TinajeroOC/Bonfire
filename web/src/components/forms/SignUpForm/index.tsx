@@ -29,7 +29,7 @@ export function SignUpForm() {
     setIsLoading(true)
 
     try {
-      const { data } = await apolloClient.mutate({
+      await apolloClient.mutate({
         mutation: SignUpDocument,
         variables: {
           username,
@@ -37,10 +37,6 @@ export function SignUpForm() {
           password,
         },
       })
-
-      if (!data?.createUser) {
-        throw new Error("Unable to sign up")
-      }
 
       router.push("/signin")
     } catch (error) {

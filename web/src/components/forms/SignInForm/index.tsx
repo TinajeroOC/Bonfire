@@ -33,8 +33,8 @@ export function SignInForm() {
         password,
       })
 
-      if (response?.error) {
-        throw new Error("Unable to sign in user")
+      if (!response?.ok) {
+        throw new Error("Your username or password is incorrect.")
       }
 
       router.push("/")
