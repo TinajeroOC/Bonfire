@@ -63,4 +63,7 @@ class User(AbstractUser):
         },
     )
 
+    first_name = None
+    last_name = None
+
     objects = UserManager()
