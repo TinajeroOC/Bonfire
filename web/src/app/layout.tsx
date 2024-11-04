@@ -6,6 +6,7 @@ import type { Metadata } from "next"
 import { ApolloProvider } from "@/components/providers/ApolloProvider"
 import { AuthProvider } from "@/components/providers/AuthProvider"
 import { ThemeProvider } from "@/components/providers/ThemeProvider"
+import { Toaster } from "@/components/ui/Toaster"
 import { siteConfig } from "@/config/site"
 
 interface RootLayoutProps {
@@ -25,6 +26,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
           <AuthProvider>
             <ApolloProvider>{children}</ApolloProvider>
           </AuthProvider>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>
