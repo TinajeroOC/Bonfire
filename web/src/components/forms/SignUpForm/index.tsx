@@ -14,9 +14,11 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/Input"
 import { PasswordInput } from "@/components/ui/PasswordInput"
 import { SignUpDocument } from "@/graphql/__generated__/operations"
+import { useToast } from "@/hooks/use-toast"
 import { SignUpInput, signUpSchema } from "@/lib/validations/auth"
 
 export function SignUpForm() {
+  const { toast } = useToast()
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [error, setError] = useState<Error>()
   const router = useRouter()
@@ -39,6 +41,8 @@ export function SignUpForm() {
       })
 
       router.push("/signin")
+
+      toast({ title: "Account Created", description: "Enter your credentials to sign in." })
     } catch (error) {
       setError(error as Error)
     } finally {
