@@ -1,5 +1,7 @@
 mutation SignUp($email: String!, $password: String!, $username: String!) {
   createUser(email: $email, password: $password, username: $username) {
+    success
+    message
     token
     refreshToken
     user {
@@ -36,5 +38,19 @@ mutation RefreshToken($refreshToken: String!) {
 mutation VerifyToken($token: String!) {
   verifyToken(token: $token) {
     payload
+  }
+}
+
+mutation UpdateEmail($newEmail: String!) {
+  updateEmail(newEmail: $newEmail) {
+    success
+    message
+  }
+}
+
+mutation UpdatePassword($currentPassword: String!, $newPassword: String!) {
+  updatePassword(currentPassword: $currentPassword, newPassword: $newPassword) {
+    success
+    message
   }
 }
