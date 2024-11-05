@@ -1,7 +1,6 @@
 import graphene
 from graphql import GraphQLError
 import graphql_jwt
-from django.contrib.auth import get_user_model
 from graphene_django import DjangoObjectType
 from graphene_federation import LATEST_VERSION, build_schema, key
 from graphql_jwt.decorators import login_required
@@ -13,8 +12,8 @@ from .models import User
 @key("id")
 class UserType(DjangoObjectType):
     class Meta:
-        model = get_user_model()
-        exclude = ['password']
+        model = User
+        exclude = ['password', 'first_name', 'last_name']
 
 
 class CreateUser(graphene.Mutation):
@@ -34,7 +33,7 @@ class CreateUser(graphene.Mutation):
         if User.objects.filter(email=email).exists():
             raise GraphQLError('An account with that email already exists.')
 
-        user = get_user_model()(
+        user = User(
             username=username,
             email=email,
         )
@@ -45,6 +44,43 @@ class CreateUser(graphene.Mutation):
         refresh_token = create_refresh_token(user)
 
         return CreateUser(user=user, token=token, refresh_token=refresh_token)
+
+
+class UpdatePassword(graphene.Mutation):
+    success = graphene.Boolean()
+
+    class Arguments:
+        current_password = graphene.String(required=True)
+        new_password = graphene.String(required=True)
+
+    @login_required
+    def mutate(self, info, current_password, new_password):
+        user = info.context.user
+
+        if not user.check_password(current_password):
+            raise GraphQLError('Old password is incorrect.')
+
+        user.set_password(new_password)
+        user.save()
+        return UpdatePassword(success=True)
+
+
+class UpdateEmail(graphene.Mutation):
+    user = graphene.Field(UserType)
+
+    class Arguments:
+        new_email = graphene.String(required=True)
+
+    @login_required
+    def mutate(self, info, new_email):
+        user = info.context.user
+
+        if User.objects.filter(email=new_email).exists():
+            raise GraphQLError('An account with that email already exists.')
+
+        user.email = new_email
+        user.save()
+        return UpdateEmail(user=user)
 
 
 class ObtainJSONWebToken(graphql_jwt.JSONWebTokenMutation):
@@ -66,6 +102,8 @@ class Query(graphene.ObjectType):
 
 class Mutation(graphene.ObjectType):
     create_user = CreateUser.Field()
+    update_email = UpdateEmail.Field()
+    update_password = UpdatePassword.Field()
     token_auth = ObtainJSONWebToken.Field()
     verify_token = graphql_jwt.Verify.Field()
     revoke_token = graphql_jwt.Revoke.Field()
