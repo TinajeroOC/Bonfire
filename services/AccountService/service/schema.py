@@ -1,5 +1,4 @@
 import graphene
-from graphql import GraphQLError
 import graphql_jwt
 from graphene_django import DjangoObjectType
 from graphene_federation import LATEST_VERSION, build_schema, key
@@ -17,6 +16,8 @@ class UserType(DjangoObjectType):
 
 
 class CreateUser(graphene.Mutation):
+    success = graphene.Boolean(required=True)
+    message = graphene.String()
     user = graphene.Field(UserType)
     token = graphene.String()
     refresh_token = graphene.String()
@@ -28,10 +29,10 @@ class CreateUser(graphene.Mutation):
 
     def mutate(self, info, username, email, password):
         if User.objects.filter(username=username).exists():
-            raise GraphQLError('An account with that username already exists.')
+            return CreateUser(success=False, message='An account with that username already exists.')
 
         if User.objects.filter(email=email).exists():
-            raise GraphQLError('An account with that email already exists.')
+            return CreateUser(success=False, message='An account with that email already exists.')
 
         user = User(
             username=username,
@@ -43,11 +44,12 @@ class CreateUser(graphene.Mutation):
         token = get_token(user)
         refresh_token = create_refresh_token(user)
 
-        return CreateUser(user=user, token=token, refresh_token=refresh_token)
+        return CreateUser(success=True, message='Account created.', user=user, token=token, refresh_token=refresh_token)
 
 
 class UpdatePassword(graphene.Mutation):
-    success = graphene.Boolean()
+    success = graphene.Boolean(required=True)
+    message = graphene.String()
 
     class Arguments:
         current_password = graphene.String(required=True)
@@ -58,15 +60,17 @@ class UpdatePassword(graphene.Mutation):
         user = info.context.user
 
         if not user.check_password(current_password):
-            raise GraphQLError('Old password is incorrect.')
+            return UpdatePassword(success=False, message="Current password is incorrect.")
 
         user.set_password(new_password)
         user.save()
-        return UpdatePassword(success=True)
+
+        return UpdatePassword(success=True, message="Account password has been updated.")
 
 
 class UpdateEmail(graphene.Mutation):
-    user = graphene.Field(UserType)
+    success = graphene.Boolean(required=True)
+    message = graphene.String()
 
     class Arguments:
         new_email = graphene.String(required=True)
@@ -76,11 +80,12 @@ class UpdateEmail(graphene.Mutation):
         user = info.context.user
 
         if User.objects.filter(email=new_email).exists():
-            raise GraphQLError('An account with that email already exists.')
+            return UpdateEmail(success=True, message="An account with that email already exists.")
 
         user.email = new_email
         user.save()
-        return UpdateEmail(user=user)
+
+        return UpdateEmail(success=True, message="Account email has been updated.")
 
 
 class ObtainJSONWebToken(graphql_jwt.JSONWebTokenMutation):
