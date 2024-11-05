@@ -112,6 +112,7 @@ export const authOptions: AuthOptions = {
     },
     async session({ session, token }) {
       session.user = token.data.user
+      session.accessToken = token.data.tokens.access
       session.validity = token.data.validity
       session.error = token.error
       return session
