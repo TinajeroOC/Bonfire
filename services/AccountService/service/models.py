@@ -56,9 +56,7 @@ class User(AbstractUser):
     )
 
     profile_picture = models.ImageField(
-        default='default-profile-picture.png',
         upload_to=user_directory_path,
-        blank=True,
         null=True
     )
 
