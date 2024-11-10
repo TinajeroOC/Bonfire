@@ -69,6 +69,7 @@ export const authOptions: AuthOptions = {
             id: data.tokenAuth.user.id,
             username: data.tokenAuth.user.username,
             email: data.tokenAuth.user.email,
+            profilePictureUrl: data.tokenAuth.user.profilePictureUrl,
           }
 
           const access: DecodedJWT = jwtDecode(data.tokenAuth.token)

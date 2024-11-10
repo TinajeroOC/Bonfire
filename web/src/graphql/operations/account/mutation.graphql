@@ -8,6 +8,7 @@ mutation SignUp($email: String!, $password: String!, $username: String!) {
       id
       username
       email
+      profilePictureUrl
     }
   }
 }
@@ -18,6 +19,7 @@ mutation SignIn($username: String!, $password: String!) {
       id
       username
       email
+      profilePictureUrl
     }
     token
     payload
