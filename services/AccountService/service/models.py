@@ -3,6 +3,10 @@ from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db import models
 
 
+def user_directory_path(instance, filename):
+    return f'{instance.id}/{filename}'
+
+
 class UserManager(BaseUserManager):
     use_in_migrations = True
 
@@ -40,17 +44,22 @@ class UserManager(BaseUserManager):
 
 class User(AbstractUser):
     username = models.CharField(
-        'username',
         max_length=20,
         unique=True,
         validators=[UnicodeUsernameValidator(regex=r'[a-zA-Z0-9]+')],
     )
 
     email = models.EmailField(
-        'email address',
         max_length=255,
         null=False,
         unique=True,
+    )
+
+    profile_picture = models.ImageField(
+        default='default-profile-picture.png',
+        upload_to=user_directory_path,
+        blank=True,
+        null=True
     )
 
     first_name = None
