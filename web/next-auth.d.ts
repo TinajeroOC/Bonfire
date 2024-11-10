@@ -6,6 +6,7 @@ declare module "next-auth" {
     id: string
     username: string
     email: string
+    profilePictureUrl?: string | null
   }
 
   export interface BackendAccessJWT {
