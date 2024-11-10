@@ -1,18 +1,25 @@
 import graphene
 import graphql_jwt
 from graphene_django import DjangoObjectType
-from graphene_federation import LATEST_VERSION, build_schema, key
+from graphene_federation import LATEST_VERSION, build_schema
 from graphql_jwt.decorators import login_required
 from graphql_jwt.shortcuts import create_refresh_token, get_token
+from graphene_file_upload.scalars import Upload
 
 from .models import User
 
 
-@key("id")
 class UserType(DjangoObjectType):
     class Meta:
         model = User
         exclude = ['password', 'first_name', 'last_name']
+
+    profile_picture_url = graphene.String()
+
+    def resolve_profile_picture_url(self, info):
+        if self.profile_picture:
+            return info.context.build_absolute_uri(self.profile_picture.url)
+        return None
 
 
 class CreateUser(graphene.Mutation):
@@ -88,6 +95,39 @@ class UpdateEmail(graphene.Mutation):
         return UpdateEmail(success=True, message="Account email has been updated.")
 
 
+class UpdateProfilePicture(graphene.Mutation):
+    success = graphene.Boolean(required=True)
+    message = graphene.String()
+    profile_picture_url = graphene.String()
+
+    class Arguments:
+        profile_picture = Upload(required=True)
+
+    @login_required
+    def mutate(self, info, profile_picture):
+        user = info.context.user
+
+        allowed_extensions = ['.jpg', '.jpeg', '.png']
+        if not any(profile_picture['name'].endswith(ext) for ext in allowed_extensions):
+            return UpdateProfilePicture(
+                success=False,
+                message="Profile picture must be a PNG or JPEG file.",
+                profile_picture_url=None
+            )
+
+        user.profile_picture = profile_picture['promise']
+        user.save()
+
+        profile_picture_url = info.context.build_absolute_uri(
+            user.profile_picture.url)
+
+        return UpdateProfilePicture(
+            success=True,
+            message="Profile picture updated.",
+            profile_picture_url=profile_picture_url,
+        )
+
+
 class ObtainJSONWebToken(graphql_jwt.JSONWebTokenMutation):
     refresh_token = graphene.NonNull(graphene.String)
     user = graphene.NonNull(UserType)
@@ -108,6 +148,7 @@ class Query(graphene.ObjectType):
 class Mutation(graphene.ObjectType):
     create_user = CreateUser.Field()
     update_email = UpdateEmail.Field()
+    update_profile_picture = UpdateProfilePicture.Field()
     update_password = UpdatePassword.Field()
     token_auth = ObtainJSONWebToken.Field()
     verify_token = graphql_jwt.Verify.Field()

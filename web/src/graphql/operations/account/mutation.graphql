@@ -54,3 +54,11 @@ mutation UpdatePassword($currentPassword: String!, $newPassword: String!) {
     message
   }
 }
+
+mutation UpdateProfilePicture($profilePicture: Upload!) {
+  updateProfilePicture(profilePicture: $profilePicture) {
+    success
+    message
+    profilePictureUrl
+  }
+}
