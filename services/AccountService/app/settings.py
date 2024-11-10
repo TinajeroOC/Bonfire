@@ -34,6 +34,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# Media Files
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Application definition
 
@@ -44,9 +47,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'service',
     'graphene_django',
-    'graphql_jwt.refresh_token.apps.RefreshTokenConfig',
+    'service',
 ]
 
 MIDDLEWARE = [
