@@ -97,7 +97,7 @@ class UpdateAccountProfile(graphene.Mutation):
 
         return UpdateAccountProfile(
             success=True,
-            message='Account updated.',
+            message='Account profile updated.',
             user=user
         )
 
@@ -125,7 +125,7 @@ class UpdateAccountMedia(graphene.Mutation):
             if not any(avatar['name'].lower().endswith(ext) for ext in allowed_extensions):
                 return UpdateAccountMedia(
                     success=False,
-                    message="User avatar must be a PNG or JPEG file."
+                    message="Account avatar must be a PNG or JPEG file."
                 )
             user.avatar = avatar['promise']
             avatar_url = info.context.build_absolute_uri(
@@ -136,7 +136,7 @@ class UpdateAccountMedia(graphene.Mutation):
             if not any(banner['name'].lower().endswith(ext) for ext in allowed_extensions):
                 return UpdateAccountMedia(
                     success=False,
-                    message="Profile banner must be a PNG or JPEG file."
+                    message="Account banner must be a PNG or JPEG file."
                 )
             user.banner = banner['promise']
             banner_url = info.context.build_absolute_uri(
@@ -146,7 +146,7 @@ class UpdateAccountMedia(graphene.Mutation):
 
         return UpdateAccountMedia(
             success=True,
-            message="User media updated successfully.",
+            message="Account media updated.",
             avatar_url=avatar_url,
             banner_url=banner_url
         )
