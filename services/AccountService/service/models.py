@@ -51,11 +51,25 @@ class User(AbstractUser):
 
     email = models.EmailField(
         max_length=255,
-        null=False,
         unique=True,
     )
 
-    profile_picture = models.ImageField(
+    display_name = models.CharField(
+        max_length=30,
+        null=True,
+    )
+
+    description = models.CharField(
+        max_length=200,
+        null=True,
+    )
+
+    avatar = models.ImageField(
+        upload_to=user_directory_path,
+        null=True
+    )
+
+    banner = models.ImageField(
         upload_to=user_directory_path,
         null=True
     )
