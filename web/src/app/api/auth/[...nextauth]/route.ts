@@ -56,27 +56,27 @@ export const authOptions: AuthOptions = {
             },
           })
 
-          if (!data?.tokenAuth) {
+          if (!data?.auth) {
             throw new Error("Unable to authenticate")
           }
 
           const tokens: BackendJWT = {
-            access: data.tokenAuth.token,
-            refresh: data.tokenAuth.refreshToken,
+            access: data.auth.token,
+            refresh: data.auth.refreshToken,
           }
 
           const user: UserObject = {
-            id: data.tokenAuth.user.id,
-            username: data.tokenAuth.user.username,
-            email: data.tokenAuth.user.email,
-            profilePictureUrl: data.tokenAuth.user.profilePictureUrl,
+            id: data.auth.user.id,
+            username: data.auth.user.username,
+            email: data.auth.user.email,
+            profilePictureUrl: data.auth.user.avatarUrl,
           }
 
-          const access: DecodedJWT = jwtDecode(data.tokenAuth.token)
+          const access: DecodedJWT = jwtDecode(data.auth.token)
 
           const validity: AuthValidity = {
             validUntil: access.exp,
-            refreshUntil: data.tokenAuth.refreshExpiresIn,
+            refreshUntil: data.auth.refreshExpiresIn,
           }
 
           return {

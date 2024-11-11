@@ -1,25 +1,31 @@
 mutation SignUp($email: String!, $password: String!, $username: String!) {
-  createUser(email: $email, password: $password, username: $username) {
+  createAccount(email: $email, password: $password, username: $username) {
     success
     message
     token
     refreshToken
     user {
       id
-      username
       email
-      profilePictureUrl
+      username
+      displayName
+      description
+      avatarUrl
+      bannerUrl
     }
   }
 }
 
 mutation SignIn($username: String!, $password: String!) {
-  tokenAuth(username: $username, password: $password) {
+  auth(username: $username, password: $password) {
     user {
       id
-      username
       email
-      profilePictureUrl
+      username
+      displayName
+      description
+      avatarUrl
+      bannerUrl
     }
     token
     payload
@@ -43,24 +49,30 @@ mutation VerifyToken($token: String!) {
   }
 }
 
-mutation UpdateEmail($newEmail: String!) {
-  updateEmail(newEmail: $newEmail) {
+mutation UpdateAccountProfile($email: String, $displayName: String, $description: String) {
+  updateAccountProfile(email: $email, displayName: $displayName, description: $description) {
     success
     message
+    user {
+      email
+      displayName
+      description
+    }
   }
 }
 
-mutation UpdatePassword($currentPassword: String!, $newPassword: String!) {
-  updatePassword(currentPassword: $currentPassword, newPassword: $newPassword) {
+mutation UpdateAccountMedia($avatar: Upload, $banner: Upload) {
+  updateAccountMedia(avatar: $avatar, banner: $banner) {
     success
     message
+    avatarUrl
+    bannerUrl
   }
 }
 
-mutation UpdateProfilePicture($profilePicture: Upload!) {
-  updateProfilePicture(profilePicture: $profilePicture) {
+mutation UpdateAccountPassword($currentPassword: String!, $newPassword: String!) {
+  updateAccountPassword(currentPassword: $currentPassword, newPassword: $newPassword) {
     success
     message
-    profilePictureUrl
   }
 }
