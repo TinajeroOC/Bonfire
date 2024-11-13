@@ -9,7 +9,7 @@ export default async function AuthLayout({ children }: AuthLayoutProps) {
     <div className="flex h-dvh flex-col overflow-hidden">
       <AuthNavbar />
       <main className="flex flex-shrink flex-grow basis-0 flex-col items-center justify-center overflow-auto">
-        <div className="px-lg w-full max-w-md">{children}</div>
+        <div className="px-6 w-full max-w-md">{children}</div>
       </main>
     </div>
   )

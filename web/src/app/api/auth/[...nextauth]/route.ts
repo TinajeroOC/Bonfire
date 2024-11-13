@@ -1,5 +1,5 @@
 import { jwtDecode } from "jwt-decode"
-import type { AuthOptions, AuthValidity, BackendJWT, DecodedJWT, User, UserObject } from "next-auth"
+import type { AuthOptions, DecodedAccessToken, Tokens, UserAttributes } from "next-auth"
 import NextAuth from "next-auth"
 import type { JWT } from "next-auth/jwt"
 import CredentialsProvider from "next-auth/providers/credentials"
@@ -7,12 +7,12 @@ import CredentialsProvider from "next-auth/providers/credentials"
 import { RefreshTokenDocument, SignInDocument } from "@/graphql/__generated__/operations"
 import { getClient } from "@/lib/apollo"
 
-async function refreshAccessToken(nextAuthJWT: JWT): Promise<JWT> {
+async function refreshAccessToken(token: JWT): Promise<JWT> {
   try {
     const { data } = await getClient().mutate({
       mutation: RefreshTokenDocument,
       variables: {
-        refreshToken: nextAuthJWT.data.tokens.refresh,
+        refreshToken: token.user.tokens.refresh,
       },
     })
 
@@ -20,22 +20,21 @@ async function refreshAccessToken(nextAuthJWT: JWT): Promise<JWT> {
       throw new Error("Unable to refresh access token")
     }
 
-    nextAuthJWT.data.validity.validUntil = data.refreshToken.payload.exp
-    nextAuthJWT.data.tokens.access = data.refreshToken.token
-    nextAuthJWT.data.tokens.refresh = data.refreshToken.refreshToken
+    token.user.tokens.access = data.refreshToken.token
+    token.user.tokens.refresh = data.refreshToken.refreshToken
+    token.user.tokens.accessExp = data.refreshToken.payload.exp
 
-    return nextAuthJWT
+    return token
   } catch (error) {
-    console.debug(error)
+    console.error(error)
     return {
-      ...nextAuthJWT,
+      ...token,
       error: "RefreshAccessTokenError",
     }
   }
 }
 
 export const authOptions: AuthOptions = {
-  secret: process.env.NEXTAUTH_SECRET,
   session: { strategy: "jwt" },
   providers: [
     CredentialsProvider({
@@ -60,31 +59,30 @@ export const authOptions: AuthOptions = {
             throw new Error("Unable to authenticate")
           }
 
-          const tokens: BackendJWT = {
-            access: data.auth.token,
-            refresh: data.auth.refreshToken,
-          }
-
-          const user: UserObject = {
+          const userAttributes: UserAttributes = {
             id: data.auth.user.id,
-            username: data.auth.user.username,
             email: data.auth.user.email,
-            profilePictureUrl: data.auth.user.avatarUrl,
+            username: data.auth.user.username,
+            displayName: data.auth.user.displayName,
+            description: data.auth.user.description,
+            avatarUrl: data.auth.user.avatarUrl,
+            bannerUrl: data.auth.user.bannerUrl,
           }
 
-          const access: DecodedJWT = jwtDecode(data.auth.token)
+          const decodedAccessToken: DecodedAccessToken = jwtDecode(data.auth.token)
 
-          const validity: AuthValidity = {
-            validUntil: access.exp,
-            refreshUntil: data.auth.refreshExpiresIn,
+          const tokens: Tokens = {
+            access: data.auth.token,
+            accessExp: decodedAccessToken.exp,
+            refresh: data.auth.refreshToken,
+            refreshExp: data.auth.refreshExpiresIn,
           }
 
           return {
-            id: user.id,
+            id: userAttributes.id,
             tokens: tokens,
-            user: user,
-            validity: validity,
-          } as User
+            attributes: userAttributes,
+          }
         } catch (error) {
           console.error(error)
           return null
@@ -93,28 +91,29 @@ export const authOptions: AuthOptions = {
     }),
   ],
   callbacks: {
-    async redirect({ url, baseUrl }) {
-      return url.startsWith(baseUrl) ? Promise.resolve(url) : Promise.resolve(baseUrl)
-    },
-    async jwt({ token, user, account }) {
-      if (user && account) {
-        return { ...token, data: user }
+    async jwt({ trigger, token, user, session }) {
+      if (trigger === "signIn") {
+        return { user }
       }
 
-      if (Date.now() < token.data.validity.validUntil * 1000) {
+      if (trigger === "update") {
+        token.user.attributes = session.userAttributes
         return token
       }
 
-      if (Date.now() < token.data.validity.refreshUntil * 1000) {
+      if (Date.now() < token.user.tokens.accessExp * 1000) {
+        return token
+      }
+
+      if (Date.now() < token.user.tokens.refreshExp * 1000) {
         return await refreshAccessToken(token)
       }
 
-      return { ...token, error: "RefreshTokenExpired" } as JWT
+      return { ...token, error: "RefreshTokenExpired" }
     },
     async session({ session, token }) {
-      session.user = token.data.user
-      session.accessToken = token.data.tokens.access
-      session.validity = token.data.validity
+      session.userAttributes = token.user.attributes
+      session.accessToken = token.user.tokens.access
       session.error = token.error
       return session
     },

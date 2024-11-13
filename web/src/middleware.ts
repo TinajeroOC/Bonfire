@@ -5,7 +5,7 @@ const authPathNames = ["/signin", "/signup"]
 
 export async function middleware(request: NextRequest) {
   const token = await getToken({ req: request })
-  const isRefreshTokenExpired = token && Date.now() >= token.data.validity.refreshUntil * 1000
+  const isRefreshTokenExpired = token && Date.now() >= token.user.tokens.refreshExp * 1000
 
   if (isRefreshTokenExpired) {
     const response = NextResponse.redirect(`${request.nextUrl.basePath}/api/auth/signin`)
