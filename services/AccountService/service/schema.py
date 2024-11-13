@@ -39,7 +39,7 @@ class Auth(graphql_jwt.JSONWebTokenMutation):
 
 class CreateAccount(graphene.Mutation):
     success = graphene.Boolean(required=True)
-    message = graphene.String()
+    message = graphene.String(required=True)
     user = graphene.Field(UserType)
     token = graphene.String()
     refresh_token = graphene.String()
@@ -51,10 +51,10 @@ class CreateAccount(graphene.Mutation):
 
     def mutate(self, info, username, email, password):
         if User.objects.filter(username=username).exists():
-            return CreateAccount(success=False, message='An account with that username already exists.')
+            return CreateAccount(success=False, message='An account with that username already exists')
 
         if User.objects.filter(email=email).exists():
-            return CreateAccount(success=False, message='An account with that email already exists.')
+            return CreateAccount(success=False, message='An account with that email already exists')
 
         user = User(
             username=username,
@@ -66,12 +66,12 @@ class CreateAccount(graphene.Mutation):
         token = get_token(user)
         refresh_token = create_refresh_token(user)
 
-        return CreateAccount(success=True, message='Account created.', user=user, token=token, refresh_token=refresh_token)
+        return CreateAccount(success=True, message=f'Successfully created an account', user=user, token=token, refresh_token=refresh_token)
 
 
 class UpdateAccountProfile(graphene.Mutation):
     success = graphene.Boolean(required=True)
-    message = graphene.String()
+    message = graphene.String(required=True)
     user = graphene.Field(UserType)
 
     class Arguments:
@@ -87,7 +87,7 @@ class UpdateAccountProfile(graphene.Mutation):
             if User.objects.filter(email=kwargs['email']).exists():
                 return UpdateAccountProfile(
                     success=False,
-                    message='An account with that email already exists.'
+                    message='An account with that email already exists'
                 )
 
         for field, value in kwargs.items():
@@ -97,14 +97,14 @@ class UpdateAccountProfile(graphene.Mutation):
 
         return UpdateAccountProfile(
             success=True,
-            message='Account profile updated.',
+            message='Successfully updated account profile',
             user=user
         )
 
 
 class UpdateAccountMedia(graphene.Mutation):
     success = graphene.Boolean(required=True)
-    message = graphene.String()
+    message = graphene.String(required=True)
     avatar_url = graphene.String()
     banner_url = graphene.String()
 
@@ -125,7 +125,7 @@ class UpdateAccountMedia(graphene.Mutation):
             if not any(avatar['name'].lower().endswith(ext) for ext in allowed_extensions):
                 return UpdateAccountMedia(
                     success=False,
-                    message="Account avatar must be a PNG or JPEG file."
+                    message="Account avatar must be a PNG or JPEG file"
                 )
             user.avatar = avatar['promise']
             avatar_url = info.context.build_absolute_uri(
@@ -136,7 +136,7 @@ class UpdateAccountMedia(graphene.Mutation):
             if not any(banner['name'].lower().endswith(ext) for ext in allowed_extensions):
                 return UpdateAccountMedia(
                     success=False,
-                    message="Account banner must be a PNG or JPEG file."
+                    message="Account banner must be a PNG or JPEG file"
                 )
             user.banner = banner['promise']
             banner_url = info.context.build_absolute_uri(
@@ -146,7 +146,7 @@ class UpdateAccountMedia(graphene.Mutation):
 
         return UpdateAccountMedia(
             success=True,
-            message="Account media updated.",
+            message="Successfully updated account media",
             avatar_url=avatar_url,
             banner_url=banner_url
         )
@@ -154,7 +154,7 @@ class UpdateAccountMedia(graphene.Mutation):
 
 class UpdateAccountPassword(graphene.Mutation):
     success = graphene.Boolean(required=True)
-    message = graphene.String()
+    message = graphene.String(required=True)
 
     class Arguments:
         current_password = graphene.String(required=True)
@@ -165,12 +165,12 @@ class UpdateAccountPassword(graphene.Mutation):
         user = info.context.user
 
         if not user.check_password(current_password):
-            return UpdateAccountPassword(success=False, message="Current password is incorrect.")
+            return UpdateAccountPassword(success=False, message="Current password is incorrect")
 
         user.set_password(new_password)
         user.save()
 
-        return UpdateAccountPassword(success=True, message="Account password has been updated.")
+        return UpdateAccountPassword(success=True, message="Successfully updated account password")
 
 
 class Query(graphene.ObjectType):
