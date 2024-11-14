@@ -2,47 +2,47 @@
 
 import { useApolloClient } from "@apollo/client"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { ArrowRight, CircleAlert, Loader2 } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { CircleAlert, Loader2 } from "lucide-react"
 import { useState } from "react"
 import { SubmitHandler, useForm } from "react-hook-form"
 import { z } from "zod"
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/Alert"
 import { Button } from "@/components/ui/Button"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/Form"
-import { Input } from "@/components/ui/Input"
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/Form"
 import { PasswordInput } from "@/components/ui/PasswordInput"
-import { SignUpDocument } from "@/graphql/__generated__/operations"
-import { useToast } from "@/hooks/use-toast"
-import { SignUpInput, signUpSchema } from "@/lib/validations/auth"
+import { UpdateAccountPasswordDocument } from "@/graphql/__generated__/operations"
+import { UpdatePasswordInput, updatePasswordSchema } from "@/lib/validations/account"
 
-export function SignUpForm() {
-  const { toast } = useToast()
+interface UpdatePasswordFormProps {
+  setModalOpen: (open: boolean) => void
+}
+
+export function UpdatePasswordForm({ setModalOpen }: UpdatePasswordFormProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [error, setError] = useState<Error>()
-  const router = useRouter()
   const apolloClient = useApolloClient()
-  const form = useForm<z.infer<typeof signUpSchema>>({
-    resolver: zodResolver(signUpSchema),
+  const form = useForm<z.infer<typeof updatePasswordSchema>>({
+    resolver: zodResolver(updatePasswordSchema),
   })
 
-  const onSubmit: SubmitHandler<SignUpInput> = async ({ username, email, password }) => {
+  const onSubmit: SubmitHandler<UpdatePasswordInput> = async ({ currentPassword, newPassword }) => {
     setIsLoading(true)
 
     try {
-      await apolloClient.mutate({
-        mutation: SignUpDocument,
+      const { data } = await apolloClient.mutate({
+        mutation: UpdateAccountPasswordDocument,
         variables: {
-          username,
-          email,
-          password,
+          currentPassword,
+          newPassword,
         },
       })
 
-      router.push("/signin")
+      if (!data?.updateAccountPassword?.success) {
+        throw new Error(data?.updateAccountPassword?.message)
+      }
 
-      toast({ title: "Account Created", description: "Enter your credentials to sign in." })
+      setModalOpen(false)
     } catch (error) {
       setError(error as Error)
     } finally {
@@ -52,58 +52,57 @@ export function SignUpForm() {
 
   return (
     <Form {...form}>
-      <form noValidate autoComplete="off" onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
+      <form noValidate autoComplete="off" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         {error && (
           <Alert variant="destructive">
             <CircleAlert className="h-4 w-4" />
-            <AlertTitle>Uh oh, there was an issue signing up</AlertTitle>
+            <AlertTitle>There was an issue updating your password</AlertTitle>
             <AlertDescription>{error.message}</AlertDescription>
           </Alert>
         )}
         <FormField
-          name="username"
+          name="currentPassword"
           control={form.control}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Username</FormLabel>
               <FormControl>
-                <Input {...field} value={field.value ?? ""} />
+                <PasswordInput {...field} value={field.value ?? ""} placeholder="Current Password" />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
         <FormField
-          name="email"
+          name="newPassword"
           control={form.control}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input {...field} value={field.value ?? ""} />
+                <PasswordInput {...field} value={field.value ?? ""} placeholder="New Password" />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
         <FormField
-          name="password"
+          name="confirmNewPassword"
           control={form.control}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Password</FormLabel>
               <FormControl>
-                <PasswordInput {...field} value={field.value ?? ""} />
+                <PasswordInput {...field} value={field.value ?? ""} placeholder="Confirm New Password" />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <div className="pt-2">
-          <Button disabled={isLoading} type="submit" className="w-full">
+        <div className="flex md:justify-end gap-2">
+          <Button onClick={() => setModalOpen(false)} variant="secondary" type="button" className="w-full md:w-fit">
+            Cancel
+          </Button>
+          <Button disabled={isLoading} className="w-full md:w-fit">
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Sign Up
-            <ArrowRight className="ml-[2px] mt-[0.5px] h-4 w-4" />
+            Save
           </Button>
         </div>
       </form>

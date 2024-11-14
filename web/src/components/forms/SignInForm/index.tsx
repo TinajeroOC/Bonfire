@@ -52,7 +52,7 @@ export function SignInForm() {
         {error && (
           <Alert variant="destructive">
             <CircleAlert className="h-4 w-4" />
-            <AlertTitle>Uh oh, there was an issue signing in!</AlertTitle>
+            <AlertTitle>Uh oh, there was an issue signing in</AlertTitle>
             <AlertDescription>{error.message}</AlertDescription>
           </Alert>
         )}

@@ -2,47 +2,52 @@
 
 import { useApolloClient } from "@apollo/client"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { ArrowRight, CircleAlert, Loader2 } from "lucide-react"
+import { CircleAlert, Loader2 } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { signOut } from "next-auth/react"
 import { useState } from "react"
 import { SubmitHandler, useForm } from "react-hook-form"
 import { z } from "zod"
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/Alert"
 import { Button } from "@/components/ui/Button"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/Form"
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/Form"
 import { Input } from "@/components/ui/Input"
 import { PasswordInput } from "@/components/ui/PasswordInput"
-import { SignUpDocument } from "@/graphql/__generated__/operations"
-import { useToast } from "@/hooks/use-toast"
-import { SignUpInput, signUpSchema } from "@/lib/validations/auth"
+import { DeleteAccountDocument } from "@/graphql/__generated__/operations"
+import { DeleteAccountInput, deleteAccountSchema } from "@/lib/validations/account"
 
-export function SignUpForm() {
-  const { toast } = useToast()
+interface DeleteAccountFormProps {
+  setModalOpen: (open: boolean) => void
+}
+
+export function DeleteAccountForm({ setModalOpen }: DeleteAccountFormProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [error, setError] = useState<Error>()
-  const router = useRouter()
   const apolloClient = useApolloClient()
-  const form = useForm<z.infer<typeof signUpSchema>>({
-    resolver: zodResolver(signUpSchema),
+  const router = useRouter()
+  const form = useForm<z.infer<typeof deleteAccountSchema>>({
+    resolver: zodResolver(deleteAccountSchema),
   })
 
-  const onSubmit: SubmitHandler<SignUpInput> = async ({ username, email, password }) => {
+  const onSubmit: SubmitHandler<DeleteAccountInput> = async ({ username, password }) => {
     setIsLoading(true)
 
     try {
-      await apolloClient.mutate({
-        mutation: SignUpDocument,
+      const { data } = await apolloClient.mutate({
+        mutation: DeleteAccountDocument,
         variables: {
           username,
-          email,
           password,
         },
       })
 
-      router.push("/signin")
+      if (!data?.deleteAccount?.success) {
+        throw new Error(data?.deleteAccount?.message)
+      }
 
-      toast({ title: "Account Created", description: "Enter your credentials to sign in." })
+      await signOut()
+      router.refresh()
     } catch (error) {
       setError(error as Error)
     } finally {
@@ -52,11 +57,11 @@ export function SignUpForm() {
 
   return (
     <Form {...form}>
-      <form noValidate autoComplete="off" onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
+      <form noValidate autoComplete="off" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         {error && (
           <Alert variant="destructive">
             <CircleAlert className="h-4 w-4" />
-            <AlertTitle>Uh oh, there was an issue signing up</AlertTitle>
+            <AlertTitle>There was an issue updating your avatar</AlertTitle>
             <AlertDescription>{error.message}</AlertDescription>
           </Alert>
         )}
@@ -65,22 +70,8 @@ export function SignUpForm() {
           control={form.control}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Username</FormLabel>
               <FormControl>
-                <Input {...field} value={field.value ?? ""} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          name="email"
-          control={form.control}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input {...field} value={field.value ?? ""} />
+                <Input {...field} value={field.value ?? ""} placeholder="Username" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -91,19 +82,20 @@ export function SignUpForm() {
           control={form.control}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Password</FormLabel>
               <FormControl>
-                <PasswordInput {...field} value={field.value ?? ""} />
+                <PasswordInput {...field} value={field.value ?? ""} placeholder="Password" />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <div className="pt-2">
-          <Button disabled={isLoading} type="submit" className="w-full">
+        <div className="flex md:justify-end gap-2">
+          <Button onClick={() => setModalOpen(false)} variant="secondary" type="button" className="w-full md:w-fit">
+            Cancel
+          </Button>
+          <Button disabled={isLoading} className="w-full md:w-fit">
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Sign Up
-            <ArrowRight className="ml-[2px] mt-[0.5px] h-4 w-4" />
+            Delete
           </Button>
         </div>
       </form>
