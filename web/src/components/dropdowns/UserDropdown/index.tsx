@@ -47,12 +47,14 @@ export function UserDropdown({ session }: UserDropdownProps) {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <Settings />
-          <Link href="/settings">Settings</Link>
-        </DropdownMenuItem>
+        <Link href="/settings">
+          <DropdownMenuItem className="hover:cursor-pointer">
+            <Settings />
+            Settings
+          </DropdownMenuItem>
+        </Link>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={onSignOut}>
+        <DropdownMenuItem onClick={onSignOut} className="hover:cursor-pointer">
           <LogOut />
           <span>Sign Out</span>
         </DropdownMenuItem>
