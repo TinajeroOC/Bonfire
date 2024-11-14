@@ -171,6 +171,29 @@ class UpdateAccountPassword(graphene.Mutation):
         return UpdateAccountPassword(success=True, message="Successfully updated account password")
 
 
+class DeleteAccount(graphene.Mutation):
+    success = graphene.Boolean(required=True)
+    message = graphene.String(required=True)
+
+    class Arguments:
+        username = graphene.String(required=True)
+        password = graphene.String(required=True)
+
+    @login_required
+    def mutate(self, info, username, password):
+        user = info.context.user
+
+        if user.username != username:
+            return DeleteAccount(success=False, message="Username is incorrect")
+
+        if not user.check_password(password):
+            return DeleteAccount(success=False, message="Password is incorrect")
+
+        user.delete()
+
+        return DeleteAccount(success=True, message="Successfully deleted account")
+
+
 class Query(graphene.ObjectType):
     viewer = graphene.Field(UserType)
 
@@ -188,6 +211,7 @@ class Mutation(graphene.ObjectType):
     update_account_profile = UpdateAccountProfile.Field()
     update_account_media = UpdateAccountMedia.Field()
     update_account_password = UpdateAccountPassword.Field()
+    delete_account = DeleteAccount.Field()
 
 
 schema = build_schema(query=Query, mutation=Mutation,

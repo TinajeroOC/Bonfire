@@ -76,3 +76,9 @@ mutation UpdateAccountPassword($currentPassword: String!, $newPassword: String!)
     message
   }
 }
+mutation DeleteAccount($username: String!, $password: String!) {
+  deleteAccount(username: $username, password: $password) {
+    success
+    message
+  }
+}
