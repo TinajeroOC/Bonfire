@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth/next"
 
-import { FeedNavbar } from "@/components/layout/FeedNavbar"
+import { AppNavbar } from "@/components/layout/AppNavbar"
 
 import { authOptions } from "../api/auth/[...nextauth]/route"
 
@@ -13,7 +13,7 @@ export default async function SettingsLayout({ children }: SettingsLayoutProps) 
 
   return (
     <div className="flex h-dvh flex-col overflow-hidden">
-      <FeedNavbar session={session} />
+      <AppNavbar session={session} />
       <main className="flex flex-shrink flex-grow basis-0 flex-col items-center overflow-auto">
         <div className="px-6 my-4 w-full max-w-5xl">
           <h1 className="scroll-m-20 text-3xl font-extrabold tracking-tight lg:text-4xl mt-4 mb-8">Settings</h1>

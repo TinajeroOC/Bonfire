@@ -11,11 +11,11 @@ import { useMediaQuery } from "@/hooks/use-media-query"
 
 const desktop = "(min-width: 768px)"
 
-interface FeedNavbarProps {
+interface AppNavbarProps {
   session: Session | null
 }
 
-export function FeedNavbar({ session }: FeedNavbarProps) {
+export function AppNavbar({ session }: AppNavbarProps) {
   const isDesktop = useMediaQuery(desktop)
 
   return (
