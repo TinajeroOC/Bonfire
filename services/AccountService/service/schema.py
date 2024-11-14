@@ -115,34 +115,32 @@ class UpdateAccountMedia(graphene.Mutation):
     @login_required
     def mutate(self, info, **kwargs):
         user = info.context.user
-        allowed_extensions = ['.jpg', '.jpeg', '.png']
-
-        avatar_url = None
-        banner_url = None
+        allowed_mimetypes = ['image/jpg', 'image/jpeg', 'image/png']
 
         if 'avatar' in kwargs:
             avatar = kwargs['avatar']
-            if not any(avatar['name'].lower().endswith(ext) for ext in allowed_extensions):
+            if not avatar['file']['mimetype'] in allowed_mimetypes:
                 return UpdateAccountMedia(
                     success=False,
                     message="Account avatar must be a PNG or JPEG file"
                 )
             user.avatar = avatar['promise']
-            avatar_url = info.context.build_absolute_uri(
-                user.profile_picture.url)
 
         if 'banner' in kwargs:
             banner = kwargs['banner']
-            if not any(banner['name'].lower().endswith(ext) for ext in allowed_extensions):
+            if not banner['file']['mimetype'] in allowed_mimetypes:
                 return UpdateAccountMedia(
                     success=False,
                     message="Account banner must be a PNG or JPEG file"
                 )
             user.banner = banner['promise']
-            banner_url = info.context.build_absolute_uri(
-                user.banner.url)
 
         user.save()
+
+        avatar_url = info.context.build_absolute_uri(
+            user.avatar.url) if user.avatar else None
+        banner_url = info.context.build_absolute_uri(
+            user.banner.url) if user.banner else None
 
         return UpdateAccountMedia(
             success=True,
