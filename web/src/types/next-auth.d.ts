@@ -20,6 +20,7 @@ declare module "next-auth" {
   }
 
   export interface DecodedAccessToken {
+    id: string
     username: string
     exp: number
     origIat: number
