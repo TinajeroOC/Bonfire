@@ -8,6 +8,13 @@ from pathlib import Path
 processes = []
 running = True
 
+SERVICE_PORTS = {
+    'AccountService': 8000,
+    'CommunityService': 8001
+}
+
+DEFAULT_PORT = 8080
+
 
 def get_python_path(service_path):
     service_path = service_path.resolve()
@@ -16,7 +23,7 @@ def get_python_path(service_path):
     return service_path / '.venv' / 'bin' / 'python'
 
 
-def run_django_service(service_path):
+def run_django_service(service_path, port):
     python_path = get_python_path(service_path)
     if not python_path.exists():
         print(f"Virtual environment not found for {
@@ -25,10 +32,12 @@ def run_django_service(service_path):
         return None
 
     process = subprocess.Popen(
-        [str(python_path), str(service_path / 'manage.py'), 'runserver'],
+        [str(python_path), str(service_path / 'manage.py'),
+         'runserver', f'127.0.0.1:{port}'],
         cwd=str(service_path),
         env=os.environ.copy()
     )
+    print(f"Started {service_path.name} on 127.0.0.1:{port}")
     return process
 
 
@@ -40,7 +49,6 @@ def run_gateway():
         return None
 
     time.sleep(5)
-
     process = subprocess.Popen(
         ['npm', 'run', 'start'],
         cwd=str(gateway_dir),
@@ -61,7 +69,6 @@ def run_nextjs():
         cwd=str(web_dir),
         env=os.environ.copy()
     )
-
     process = subprocess.Popen(
         ['npm', 'run', 'dev'],
         cwd=str(web_dir),
@@ -107,22 +114,21 @@ def main():
     for service_dir in services_dir.iterdir():
         if not service_dir.is_dir():
             continue
+
         if (service_dir / 'manage.py').exists():
-            print(f"Starting {service_dir.name}...")
+            port = SERVICE_PORTS.get(service_dir.name, DEFAULT_PORT)
+            print(f"Starting {service_dir.name} on port {port}...")
             print(f"Service directory: {service_dir.resolve()}")
-            process = run_django_service(service_dir)
+            process = run_django_service(service_dir, port)
             if process:
                 processes.append(process)
-                print(f"Started {service_dir.name}")
-
-    time.sleep(3)
+            time.sleep(3)
 
     print("Starting Apollo gateway...")
     gateway_process = run_gateway()
     if gateway_process:
         processes.append(gateway_process)
         print("Started Apollo gateway")
-
     time.sleep(3)
 
     print("Starting NextJS frontend...")

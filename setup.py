@@ -135,6 +135,10 @@ def main():
             if not service_dir.is_dir():
                 continue
 
+            if service_dir.name == 'core':
+                print(f"Skipping {service_dir.name}: explicitly ignored")
+                continue
+
             requirements_file = service_dir / 'requirements.txt'
             if not requirements_file.exists():
                 print(f"Skipping {
