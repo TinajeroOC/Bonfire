@@ -1,0 +1,98 @@
+mutation CreateCommunity(
+  $name: String!
+  $title: String!
+  $description: String!
+  $banner: Upload
+  $icon: Upload
+  $isPublic: Boolean
+) {
+  createCommunity(
+    name: $name
+    title: $title
+    description: $description
+    banner: $banner
+    icon: $icon
+    isPublic: $isPublic
+  ) {
+    success
+    message
+    community {
+      id
+      name
+      title
+      description
+      banner
+      bannerUrl
+      icon
+      iconUrl
+      isMember
+      isOwner
+      isPublic
+      ownerId
+      memberCount
+      dateCreated
+    }
+  }
+}
+
+mutation UpdateCommunity(
+  $communityId: ID!
+  $title: String
+  $description: String
+  $isPublic: Boolean
+  $icon: Upload
+  $banner: Upload
+  $removeIcon: Boolean
+  $removeBanner: Boolean
+) {
+  updateCommunity(
+    communityId: $communityId
+    title: $title
+    description: $description
+    isPublic: $isPublic
+    icon: $icon
+    banner: $banner
+    removeIcon: $removeIcon
+    removeBanner: $removeBanner
+  ) {
+    success
+    message
+    community {
+      id
+      name
+      title
+      description
+      banner
+      bannerUrl
+      icon
+      iconUrl
+      isMember
+      isOwner
+      isPublic
+      ownerId
+      memberCount
+      dateCreated
+    }
+  }
+}
+
+mutation DeleteCommunity($communityId: ID!) {
+  deleteCommunity(communityId: $communityId) {
+    success
+    message
+  }
+}
+
+mutation JoinCommunity($communityId: ID!) {
+  joinCommunity(communityId: $communityId) {
+    success
+    message
+  }
+}
+
+mutation LeaveCommunity($communityId: ID!) {
+  leaveCommunity(communityId: $communityId) {
+    success
+    message
+  }
+}
