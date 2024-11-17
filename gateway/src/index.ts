@@ -33,7 +33,10 @@ async function startApolloServer() {
 
   const gateway = new ApolloGateway({
     supergraphSdl: new IntrospectAndCompose({
-      subgraphs: [{ name: "AccountService", url: "http://127.0.0.1:8000/graphql/" }],
+      subgraphs: [
+        { name: "Account Service", url: "http://127.0.0.1:8000/graphql/" },
+        { name: "Community Service", url: "http://127.0.0.1:8001/graphql/" },
+      ],
     }),
     buildService: ({ url }) =>
       new AuthenticatedDataSource({
