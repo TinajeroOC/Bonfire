@@ -49,24 +49,37 @@ mutation VerifyToken($token: String!) {
   }
 }
 
-mutation UpdateAccountProfile($email: String, $displayName: String, $description: String) {
-  updateAccountProfile(email: $email, displayName: $displayName, description: $description) {
+mutation updateAccount(
+  $email: String
+  $displayName: String
+  $description: String
+  $avatar: Upload
+  $banner: Upload
+  $removeAvatar: Boolean
+  $removeBanner: Boolean
+) {
+  updateAccount(
+    email: $email
+    displayName: $displayName
+    description: $description
+    avatar: $avatar
+    banner: $banner
+    removeAvatar: $removeAvatar
+    removeBanner: $removeBanner
+  ) {
     success
     message
     user {
+      id
+      username
       email
       displayName
       description
+      avatar
+      banner
+      avatarUrl
+      bannerUrl
     }
-  }
-}
-
-mutation UpdateAccountMedia($avatar: Upload, $banner: Upload) {
-  updateAccountMedia(avatar: $avatar, banner: $banner) {
-    success
-    message
-    avatarUrl
-    bannerUrl
   }
 }
 

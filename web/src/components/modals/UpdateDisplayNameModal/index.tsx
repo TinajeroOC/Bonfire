@@ -1,7 +1,6 @@
 "use client"
 
 import { ChevronRight } from "lucide-react"
-import { useSession } from "next-auth/react"
 import { useState } from "react"
 
 import { UpdateDisplayNameForm } from "@/components/forms/UpdateDisplayNameForm"
@@ -17,7 +16,6 @@ import {
 
 export function UpdateDisplayNameModal() {
   const [open, setOpen] = useState(false)
-  const { data: session } = useSession()
 
   return (
     <Modal open={open} onOpenChange={setOpen}>
@@ -29,14 +27,7 @@ export function UpdateDisplayNameModal() {
               Choose a custom name to be shown on your profile
             </span>
           </span>
-          <span className="flex items-center shrink-0 gap-2">
-            {session?.userAttributes.displayName && (
-              <span className="text-xs text-foreground text-left bg-orange-600 py-1 px-2 rounded-full">
-                {session?.userAttributes.displayName}
-              </span>
-            )}
-            <ChevronRight className="h-6 w-6" />
-          </span>
+          <ChevronRight className="h-6 w-6" />
         </div>
       </ModalTrigger>
       <ModalContent>

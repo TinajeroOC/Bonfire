@@ -13,7 +13,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/Alert"
 import { Button } from "@/components/ui/Button"
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/Form"
 import { Input } from "@/components/ui/Input"
-import { UpdateAccountMediaDocument } from "@/graphql/__generated__/operations"
+import { UpdateAccountDocument } from "@/graphql/__generated__/operations"
 import { UpdateAvatarInput, updateAvatarSchema } from "@/lib/validations/account"
 
 interface UpdateAvatarFormProps {
@@ -35,21 +35,21 @@ export function UpdateAvatarForm({ setModalOpen }: UpdateAvatarFormProps) {
 
     try {
       const { data } = await apolloClient.mutate({
-        mutation: UpdateAccountMediaDocument,
+        mutation: UpdateAccountDocument,
         variables: {
           avatar,
         },
       })
 
-      if (!data?.updateAccountMedia?.success) {
-        throw new Error(data?.updateAccountMedia?.message)
+      if (!data?.updateAccount?.success) {
+        throw new Error(data?.updateAccount?.message)
       }
 
       await updateSession({
         ...session,
         userAttributes: {
           ...session?.userAttributes,
-          avatarUrl: data.updateAccountMedia.avatarUrl,
+          avatarUrl: data.updateAccount.user?.avatarUrl,
         },
       })
 

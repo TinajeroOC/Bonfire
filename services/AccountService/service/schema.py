@@ -5,15 +5,10 @@ from graphene_federation import LATEST_VERSION, build_schema
 from graphql_jwt.decorators import login_required
 from graphql_jwt.shortcuts import create_refresh_token, get_token
 from graphene_file_upload.scalars import Upload
-
 from .models import User
 
 
 class UserType(DjangoObjectType):
-    class Meta:
-        model = User
-        exclude = ['password', 'first_name', 'last_name']
-
     avatar_url = graphene.String()
     banner_url = graphene.String()
 
@@ -26,6 +21,10 @@ class UserType(DjangoObjectType):
         if self.banner:
             return info.context.build_absolute_uri(self.banner.url)
         return None
+
+    class Meta:
+        model = User
+        exclude = ['password', 'first_name', 'last_name']
 
 
 class Auth(graphql_jwt.JSONWebTokenMutation):
@@ -66,10 +65,10 @@ class CreateAccount(graphene.Mutation):
         token = get_token(user)
         refresh_token = create_refresh_token(user)
 
-        return CreateAccount(success=True, message=f'Successfully created an account', user=user, token=token, refresh_token=refresh_token)
+        return CreateAccount(success=True, message='Successfully created an account', user=user, token=token, refresh_token=refresh_token)
 
 
-class UpdateAccountProfile(graphene.Mutation):
+class UpdateAccount(graphene.Mutation):
     success = graphene.Boolean(required=True)
     message = graphene.String(required=True)
     user = graphene.Field(UserType)
@@ -78,75 +77,68 @@ class UpdateAccountProfile(graphene.Mutation):
         email = graphene.String()
         display_name = graphene.String()
         description = graphene.String()
-
-    @login_required
-    def mutate(self, info, **kwargs):
-        user = info.context.user
-
-        if 'email' in kwargs and kwargs['email'] != user.email:
-            if User.objects.filter(email=kwargs['email']).exists():
-                return UpdateAccountProfile(
-                    success=False,
-                    message='An account with that email already exists'
-                )
-
-        for field, value in kwargs.items():
-            setattr(user, field, value)
-
-        user.save()
-
-        return UpdateAccountProfile(
-            success=True,
-            message='Successfully updated account profile',
-            user=user
-        )
-
-
-class UpdateAccountMedia(graphene.Mutation):
-    success = graphene.Boolean(required=True)
-    message = graphene.String(required=True)
-    avatar_url = graphene.String()
-    banner_url = graphene.String()
-
-    class Arguments:
         avatar = Upload()
         banner = Upload()
+        remove_avatar = graphene.Boolean(default_value=False)
+        remove_banner = graphene.Boolean(default_value=False)
 
     @login_required
-    def mutate(self, info, **kwargs):
+    def mutate(self, info, email=None, display_name=None, description=None, avatar=None, banner=None, remove_avatar=False, remove_banner=False):
         user = info.context.user
         allowed_mimetypes = ['image/jpg', 'image/jpeg', 'image/png']
 
-        if 'avatar' in kwargs:
-            avatar = kwargs['avatar']
+        if email is not None and email != user.email:
+            if User.objects.filter(email=email).exists():
+                return UpdateAccount(
+                    success=False,
+                    message='An account with that email already exists'
+                )
+            user.email = email
+
+        if display_name is not None:
+            user.display_name = display_name
+
+        if description is not None:
+            user.description = description
+
+        if remove_avatar:
+            user.avatar.delete(save=False)
+            user.avatar = None
+        elif avatar is not None:
             if not avatar['file']['mimetype'] in allowed_mimetypes:
-                return UpdateAccountMedia(
+                return UpdateAccount(
                     success=False,
                     message="Account avatar must be a PNG or JPEG file"
                 )
+            if user.avatar:
+                try:
+                    user.avatar.delete(save=False)
+                except Exception as e:
+                    print(f"Error deleting old avatar: {str(e)}")
             user.avatar = avatar['promise']
 
-        if 'banner' in kwargs:
-            banner = kwargs['banner']
+        if remove_banner:
+            user.banner.delete(save=False)
+            user.banner = None
+        elif banner is not None:
             if not banner['file']['mimetype'] in allowed_mimetypes:
-                return UpdateAccountMedia(
+                return UpdateAccount(
                     success=False,
                     message="Account banner must be a PNG or JPEG file"
                 )
+            if user.banner:
+                try:
+                    user.banner.delete(save=False)
+                except Exception as e:
+                    print(f"Error deleting old banner: {str(e)}")
             user.banner = banner['promise']
 
         user.save()
 
-        avatar_url = info.context.build_absolute_uri(
-            user.avatar.url) if user.avatar else None
-        banner_url = info.context.build_absolute_uri(
-            user.banner.url) if user.banner else None
-
-        return UpdateAccountMedia(
+        return UpdateAccount(
             success=True,
-            message="Successfully updated account media",
-            avatar_url=avatar_url,
-            banner_url=banner_url
+            message='Successfully updated account',
+            user=user,
         )
 
 
@@ -198,7 +190,7 @@ class Query(graphene.ObjectType):
     viewer = graphene.Field(UserType)
 
     @login_required
-    def resolve_viewer(self, info, **kwargs):
+    def resolve_viewer(self, info):
         return info.context.user
 
 
@@ -208,11 +200,13 @@ class Mutation(graphene.ObjectType):
     revoke_token = graphql_jwt.Revoke.Field()
     refresh_token = graphql_jwt.Refresh.Field()
     create_account = CreateAccount.Field()
-    update_account_profile = UpdateAccountProfile.Field()
-    update_account_media = UpdateAccountMedia.Field()
+    update_account = UpdateAccount.Field()
     update_account_password = UpdateAccountPassword.Field()
     delete_account = DeleteAccount.Field()
 
 
-schema = build_schema(query=Query, mutation=Mutation,
-                      federation_version=LATEST_VERSION)
+schema = build_schema(
+    query=Query,
+    mutation=Mutation,
+    federation_version=LATEST_VERSION
+)
