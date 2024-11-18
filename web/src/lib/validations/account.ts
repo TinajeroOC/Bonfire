@@ -35,22 +35,22 @@ export const updateEmailSchema = z
 export type updateEmailInput = z.infer<typeof updateEmailSchema>
 
 export const updateDisplayNameSchema = z.object({
-  displayName: z.string().max(30, "Display name must shorter than 30 characters").optional(),
+  displayName: z.string().max(30, "Display name must be shorter than 30 characters").optional(),
 })
 
 export type UpdateDisplayNameInput = z.infer<typeof updateDisplayNameSchema>
 
 export const updateDescriptionSchema = z.object({
-  description: z.string().max(200, "Description must shorter than 200 characters").optional(),
+  description: z.string().max(200, "Description must be shorter than 200 characters").optional(),
 })
 
 export type UpdateDescriptionInput = z.infer<typeof updateDescriptionSchema>
 
 export const updatePasswordSchema = z
   .object({
-    currentPassword: z.string().min(1, { message: "Enter your current password" }),
-    newPassword: z.string().min(1, { message: "Enter a password" }),
-    confirmNewPassword: z.string().min(1, { message: "Enter a password" }),
+    currentPassword: z.string({ message: "Enter your current password" }),
+    newPassword: z.string({ message: "Enter a password" }),
+    confirmNewPassword: z.string({ message: "Enter a password" }),
   })
   .refine(({ newPassword, confirmNewPassword }) => newPassword === confirmNewPassword, {
     message: "New passwords must match",
@@ -60,8 +60,8 @@ export const updatePasswordSchema = z
 export type UpdatePasswordInput = z.infer<typeof updatePasswordSchema>
 
 export const deleteAccountSchema = z.object({
-  username: z.string().min(1, { message: "Enter your username" }),
-  password: z.string().min(1, { message: "Enter your password" }),
+  username: z.string({ message: "Enter your username" }),
+  password: z.string({ message: "Enter your password" }),
 })
 
 export type DeleteAccountInput = z.infer<typeof deleteAccountSchema>

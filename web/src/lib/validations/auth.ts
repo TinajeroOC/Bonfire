@@ -7,7 +7,7 @@ export const signUpSchema = z.object({
     .min(3, "Username must be at least 3 characters")
     .max(20, "Username must shorter than 20 characters"),
   email: z.string().email({ message: "Enter a valid email" }),
-  password: z.string().min(10, { message: "Enter a password with at least 10 characters" }),
+  password: z.string({ message: "Enter a password" }),
 })
 
 export type SignUpInput = z.infer<typeof signUpSchema>
