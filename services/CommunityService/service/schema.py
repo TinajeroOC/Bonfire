@@ -39,8 +39,8 @@ class CommunityType(DjangoObjectType):
 
 
 class CreateCommunity(graphene.Mutation):
-    success = graphene.Boolean()
-    message = graphene.String()
+    success = graphene.Boolean(required=True)
+    message = graphene.String(required=True)
     community = graphene.Field(CommunityType)
 
     class Arguments:
@@ -52,7 +52,7 @@ class CreateCommunity(graphene.Mutation):
         banner = Upload()
 
     @login_required
-    def mutate(self, info, name, title, description, is_public, icon, banner):
+    def mutate(self, info, name, title, description, is_public, icon=None, banner=None):
         allowed_mimetypes = ['image/jpg', 'image/jpeg', 'image/png']
 
         try:
@@ -114,8 +114,8 @@ class CreateCommunity(graphene.Mutation):
 
 
 class UpdateCommunity(graphene.Mutation):
-    success = graphene.Boolean()
-    message = graphene.String()
+    success = graphene.Boolean(required=True)
+    message = graphene.String(required=True)
     community = graphene.Field(CommunityType)
 
     class Arguments:
@@ -207,8 +207,8 @@ class UpdateCommunity(graphene.Mutation):
 
 
 class JoinCommunity(graphene.Mutation):
-    success = graphene.Boolean()
-    message = graphene.String()
+    success = graphene.Boolean(required=True)
+    message = graphene.String(required=True)
 
     class Arguments:
         community_id = graphene.ID(required=True)
@@ -244,8 +244,8 @@ class JoinCommunity(graphene.Mutation):
 
 
 class LeaveCommunity(graphene.Mutation):
-    success = graphene.Boolean()
-    message = graphene.String()
+    success = graphene.Boolean(required=True)
+    message = graphene.String(required=True)
 
     class Arguments:
         community_id = graphene.ID(required=True)
@@ -281,8 +281,8 @@ class LeaveCommunity(graphene.Mutation):
 
 
 class DeleteCommunity(graphene.Mutation):
-    success = graphene.Boolean()
-    message = graphene.String()
+    success = graphene.Boolean(required=True)
+    message = graphene.String(required=True)
 
     class Arguments:
         community_id = graphene.ID(required=True)
