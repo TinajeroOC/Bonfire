@@ -4,6 +4,7 @@ import { useApolloClient } from "@apollo/client"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ArrowRight, CircleAlert, Loader2 } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { signIn } from "next-auth/react"
 import { useState } from "react"
 import { SubmitHandler, useForm } from "react-hook-form"
 import { z } from "zod"
@@ -40,9 +41,19 @@ export function SignUpForm() {
         },
       })
 
-      router.push("/signin")
+      const response = await signIn("credentials", {
+        redirect: false,
+        username,
+        password,
+      })
 
-      toast({ title: "Account Created", description: "Enter your credentials to sign in." })
+      if (!response?.ok) {
+        throw new Error("Issue signing in after sign up")
+      }
+
+      router.refresh()
+
+      toast({ title: "Account Created", description: "You have been signed in automatically" })
     } catch (error) {
       setError(error as Error)
     } finally {
