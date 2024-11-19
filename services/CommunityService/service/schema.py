@@ -29,10 +29,14 @@ class CommunityType(DjangoObjectType):
         return self.member_count()
 
     def resolve_is_member(self, info):
-        return self.is_member(info.context.user['id'])
+        if info.context.user is not None:
+            return self.is_member(info.context.user['id'])
+        return False
 
     def resolve_is_owner(self, info):
-        return self.owner_id == info.context.user['id']
+        if info.context.user is not None:
+            return self.is_owner(info.context.user['id'])
+        return False
 
     class Meta:
         model = Community
@@ -261,7 +265,7 @@ class LeaveCommunity(graphene.Mutation):
                     message="You are not a member of this community"
                 )
 
-            if community.owner_id == info.context.user['id']:
+            if community.is_owner(info.context.user['id']):
                 return LeaveCommunity(
                     success=False,
                     message="Community owner cannot leave the community"
@@ -292,7 +296,7 @@ class DeleteCommunity(graphene.Mutation):
         try:
             community = Community.objects.get(id=community_id)
 
-            if community.owner_id != info.context.user['id']:
+            if not community.is_owner(info.context.user['id']):
                 return DeleteCommunity(
                     success=False,
                     message="Only the community owner can delete the community"

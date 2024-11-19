@@ -19,7 +19,7 @@ class Community(models.Model):
     description = models.TextField(max_length=500)
     date_created = models.DateTimeField(auto_now_add=True)
     is_public = models.BooleanField(default=True)
-    owner_id = models.PositiveIntegerField()
+    owner_id = models.CharField(max_length=255)
     icon = models.ImageField(
         upload_to=community_directory_path,
         null=True
@@ -29,13 +29,13 @@ class Community(models.Model):
         null=True
     )
 
-    def add_member(self, user_id: int) -> 'CommunityMembership':
+    def add_member(self, user_id: str) -> 'CommunityMembership':
         return CommunityMembership.objects.create(
             user_id=user_id,
             community=self
         )
 
-    def remove_member(self, user_id: int) -> None:
+    def remove_member(self, user_id: str) -> None:
         CommunityMembership.objects.filter(
             user_id=user_id,
             community=self
@@ -44,8 +44,11 @@ class Community(models.Model):
     def get_member_ids(self) -> List[int]:
         return list(self.communitymembership_set.values_list('user_id', flat=True))
 
-    def is_member(self, user_id: int) -> bool:
+    def is_member(self, user_id: str) -> bool:
         return self.communitymembership_set.filter(user_id=user_id).exists()
+
+    def is_owner(self, user_id: str) -> bool:
+        return self.owner_id == user_id
 
     def member_count(self) -> int:
         return self.communitymembership_set.count()
