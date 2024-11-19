@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from "next/server"
-import { getToken } from "next-auth/jwt"
+import { NextRequest, NextResponse } from 'next/server'
+import { getToken } from 'next-auth/jwt'
 
 function isSettingsPath(path: string) {
-  return path.startsWith("/settings")
+  return path.startsWith('/settings')
 }
 
 export async function middleware(request: NextRequest) {
@@ -11,19 +11,19 @@ export async function middleware(request: NextRequest) {
 
   if (isRefreshTokenExpired) {
     const response = NextResponse.redirect(`${request.nextUrl.basePath}/api/auth/signin`)
-    response.cookies.set("next-auth.session-token", "", { maxAge: 0 })
-    response.cookies.set("next-auth.csrf-token", "", { maxAge: 0 })
+    response.cookies.set('next-auth.session-token', '', { maxAge: 0 })
+    response.cookies.set('next-auth.csrf-token', '', { maxAge: 0 })
     return response
   }
 
   const { pathname } = request.nextUrl
 
-  if (pathname === "/") {
-    return NextResponse.rewrite(new URL("/feed", request.url))
+  if (pathname === '/') {
+    return NextResponse.rewrite(new URL('/feed', request.url))
   }
 
   if (!token && isSettingsPath(pathname)) {
-    return NextResponse.redirect(new URL("/", request.url))
+    return NextResponse.redirect(new URL('/', request.url))
   }
 
   return NextResponse.next()
@@ -38,6 +38,6 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico, sitemap.xml, robots.txt (metadata files)
      */
-    "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
+    '/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)',
   ],
 }

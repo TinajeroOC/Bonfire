@@ -1,4 +1,5 @@
-'use client'
+import { Flame, Home, SearchIcon } from 'lucide-react'
+import Link from 'next/link'
 
 import {
   Sidebar,
@@ -12,7 +13,6 @@ import {
   SidebarSeparator,
 } from '@/components/ui/Sidebar'
 import { siteConfig } from '@/config/site'
-import { CommunitiesDocument } from '@/graphql/__generated__/operations'
 
 const items = [
   {
@@ -43,7 +43,7 @@ export function AppSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <Link href={item.url}>
+                    <a href={item.url}>
                       <item.icon />
                       <span>{item.title}</span>
                     </a>

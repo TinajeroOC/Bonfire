@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { User, UserAttributes } from "next-auth"
+import type { User, UserAttributes } from 'next-auth'
 
-declare module "next-auth" {
+declare module 'next-auth' {
   export interface UserAttributes {
     id: string
     email: string
@@ -34,13 +34,13 @@ declare module "next-auth" {
   export interface Session {
     userAttributes: UserAttributes
     accessToken: string
-    error?: "RefreshTokenExpired" | "RefreshAccessTokenError"
+    error?: 'RefreshTokenExpired' | 'RefreshAccessTokenError'
   }
 }
 
-declare module "next-auth/jwt" {
+declare module 'next-auth/jwt' {
   export interface JWT {
     user: User
-    error?: "RefreshTokenExpired" | "RefreshAccessTokenError"
+    error?: 'RefreshTokenExpired' | 'RefreshAccessTokenError'
   }
 }

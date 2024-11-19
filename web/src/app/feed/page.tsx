@@ -1,9 +1,9 @@
 export default function FeedPage() {
   return (
-    <main className="flex flex-shrink flex-grow basis-0 flex-col items-center justify-center overflow-auto">
-      <div className="px-6 w-full max-w-md">
-        <div className="flex items-center flex-col">
-          <h1 className="font-bold text-4xl">Bonfire</h1>
+    <main className='flex flex-shrink flex-grow basis-0 flex-col items-center justify-center overflow-auto'>
+      <div className='w-full max-w-md px-6'>
+        <div className='flex flex-col items-center'>
+          <h1 className='text-4xl font-bold'>Bonfire</h1>
         </div>
       </div>
     </main>

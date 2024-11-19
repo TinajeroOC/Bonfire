@@ -1,6 +1,6 @@
-"use client"
+'use client'
 
-import * as React from "react"
+import * as React from 'react'
 
 import {
   Dialog,
@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/Dialog"
+} from '@/components/ui/Dialog'
 import {
   Drawer,
   DrawerClose,
@@ -21,9 +21,9 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from "@/components/ui/Drawer"
-import { useMediaQuery } from "@/hooks/use-media-query"
-import { ny } from "@/lib/utils"
+} from '@/components/ui/Drawer'
+import { useMediaQuery } from '@/hooks/use-media-query'
+import { ny } from '@/lib/utils'
 
 interface BaseProps {
   children: React.ReactNode
@@ -39,7 +39,7 @@ interface ModalProps extends BaseProps {
   asChild?: true
 }
 
-const desktop = "(min-width: 768px)"
+const desktop = '(min-width: 768px)'
 
 const Modal = ({ children, ...props }: RootModalProps) => {
   const isDesktop = useMediaQuery(desktop)
@@ -116,7 +116,7 @@ const ModalTitle = ({ className, children, ...props }: ModalProps) => {
 
 const ModalBody = ({ className, children, ...props }: ModalProps) => {
   return (
-    <div className={ny("px-4 md:px-0 md:pb-0 pb-4", className)} {...props}>
+    <div className={ny('px-4 pb-4 md:px-0 md:pb-0', className)} {...props}>
       {children}
     </div>
   )
