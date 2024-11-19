@@ -1,0 +1,45 @@
+query Community($id: ID, $name: String) {
+  community(id: $id, name: $name) {
+    success
+    message
+    community {
+      id
+      name
+      title
+      description
+      dateCreated
+      isPublic
+      ownerId
+      icon
+      banner
+      iconUrl
+      bannerUrl
+      memberCount
+      isMember
+      isOwner
+    }
+  }
+}
+
+query Communities($filter: CommunitiesFilter) {
+  communities(filter: $filter) {
+    success
+    message
+    communities {
+      id
+      name
+      title
+      description
+      dateCreated
+      isPublic
+      ownerId
+      icon
+      banner
+      iconUrl
+      bannerUrl
+      memberCount
+      isMember
+      isOwner
+    }
+  }
+}

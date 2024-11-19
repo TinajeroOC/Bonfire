@@ -4,6 +4,7 @@ from graphene_federation import LATEST_VERSION, build_schema
 from graphene_file_upload.scalars import Upload
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
+from django.db.models import Q
 from core.decorators import login_required
 from .models import Community
 
@@ -326,32 +327,101 @@ class DeleteCommunity(graphene.Mutation):
             )
 
 
-class Query(graphene.ObjectType):
+class CommunitiesResponse(graphene.ObjectType):
+    success = graphene.Boolean(required=True)
+    message = graphene.String(required=True)
     communities = graphene.List(CommunityType)
-    community = graphene.Field(CommunityType, id=graphene.ID(required=True))
-    my_communities = graphene.List(CommunityType)
 
-    @login_required
-    def resolve_communities(self, info):
-        return Community.objects.filter(is_public=True)
 
-    @login_required
-    def resolve_community(self, info, id):
+class CommunityResponse(graphene.ObjectType):
+    success = graphene.Boolean(required=True)
+    message = graphene.String(required=True)
+    community = graphene.Field(CommunityType)
+
+
+class CommunitiesFilter(graphene.InputObjectType):
+    name = graphene.String(required=False)
+    is_member_only = graphene.Boolean(default_value=False)
+    include_private = graphene.Boolean(default_value=True)
+
+
+class Query(graphene.ObjectType):
+    community = graphene.Field(
+        CommunityResponse,
+        id=graphene.ID(required=False),
+        name=graphene.String(required=False)
+    )
+    communities = graphene.Field(
+        CommunitiesResponse,
+        filter=graphene.Argument(CommunitiesFilter, default_value=None)
+    )
+
+    def resolve_community(self, info, id=None, name=None):
+        if not id and not name:
+            return CommunityResponse(
+                success=False,
+                message="Either 'id' or 'name' must be provided",
+                community=None
+            )
+
         try:
-            community = Community.objects.get(id=id)
-            if community.is_public or community.is_member(info.context.user['id']):
-                return community
-            return None
-        except Community.DoesNotExist:
-            return None
+            if id:
+                community = Community.objects.get(id=id)
+            else:
+                community = Community.objects.get(name=name)
 
-    @login_required
-    def resolve_my_communities(self, info):
-        user_id = info.context.user['id']
-        member_communities = Community.objects.filter(
-            communitymembership__user_id=user_id
-        )
-        return member_communities
+            user_id = None
+            if info.context.user is not None:
+                user_id = info.context.user['id']
+
+            if community.is_public or (user_id and community.is_member(user_id)):
+                return CommunityResponse(
+                    success=True,
+                    message="Community retrieved successfully",
+                    community=community
+                )
+            return CommunityResponse(
+                success=False,
+                message="You don't have access to this community",
+                community=None
+            )
+        except Community.DoesNotExist:
+            return CommunityResponse(
+                success=False,
+                message="Community not found",
+                community=None
+            )
+
+    def resolve_communities(self, info, filter=None):
+        try:
+            queryset = Community.objects.all()
+
+            user_id = None
+            if info.context.user is not None:
+                user_id = info.context.user['id']
+
+            if filter:
+                if filter.is_member_only and user_id:
+                    queryset = queryset.filter(
+                        communitymembership__user_id=user_id)
+                if not filter.include_private:
+                    queryset = queryset.filter(is_public=True)
+                if filter.name:
+                    queryset = queryset.filter(Q(name__icontains=filter.name))
+            else:
+                queryset = queryset.filter(is_public=True)
+
+            return CommunitiesResponse(
+                success=True,
+                message="Communities retrieved successfully",
+                communities=queryset
+            )
+        except Exception as e:
+            return CommunitiesResponse(
+                success=False,
+                message=f"Failed to retrieve communities: {str(e)}",
+                communities=[]
+            )
 
 
 class Mutation(graphene.ObjectType):
