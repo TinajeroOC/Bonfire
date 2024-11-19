@@ -1,9 +1,8 @@
 "use client"
 
-import { useApolloClient } from "@apollo/client"
+import { useMutation } from "@apollo/client"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { CircleAlert, Loader2 } from "lucide-react"
-import { useState } from "react"
 import { SubmitHandler, useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -19,45 +18,39 @@ interface UpdatePasswordFormProps {
 }
 
 export function UpdatePasswordForm({ setModalOpen }: UpdatePasswordFormProps) {
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [error, setError] = useState<Error>()
-  const apolloClient = useApolloClient()
+  const [updateAccountPassword, { loading }] = useMutation(UpdateAccountPasswordDocument)
+
   const form = useForm<z.infer<typeof updatePasswordSchema>>({
     resolver: zodResolver(updatePasswordSchema),
   })
 
   const onSubmit: SubmitHandler<UpdatePasswordInput> = async ({ currentPassword, newPassword }) => {
-    setIsLoading(true)
-
     try {
-      const { data } = await apolloClient.mutate({
-        mutation: UpdateAccountPasswordDocument,
+      const { data: mutation } = await updateAccountPassword({
         variables: {
           currentPassword,
           newPassword,
         },
       })
 
-      if (!data?.updateAccountPassword?.success) {
-        throw new Error(data?.updateAccountPassword?.message)
+      if (!mutation?.updateAccountPassword?.success) {
+        throw new Error(mutation?.updateAccountPassword?.message)
       }
 
       setModalOpen(false)
     } catch (error) {
-      setError(error as Error)
-    } finally {
-      setIsLoading(false)
+      form.setError("root", { message: (error as Error).message })
     }
   }
 
   return (
     <Form {...form}>
       <form noValidate autoComplete="off" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        {error && (
+        {form.formState.errors.root && (
           <Alert variant="destructive">
             <CircleAlert className="h-4 w-4" />
             <AlertTitle>There was an issue updating your password</AlertTitle>
-            <AlertDescription>{error.message}</AlertDescription>
+            <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
           </Alert>
         )}
         <FormField
@@ -100,8 +93,8 @@ export function UpdatePasswordForm({ setModalOpen }: UpdatePasswordFormProps) {
           <Button onClick={() => setModalOpen(false)} variant="secondary" type="button" className="w-full md:w-fit">
             Cancel
           </Button>
-          <Button disabled={isLoading} className="w-full md:w-fit">
-            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          <Button disabled={loading} className="w-full md:w-fit">
+            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Save
           </Button>
         </div>

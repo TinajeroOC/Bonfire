@@ -16,15 +16,14 @@ import { PasswordInput } from "@/components/ui/PasswordInput"
 import { SignInInput, signInSchema } from "@/lib/validations/auth"
 
 export function SignInForm() {
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [error, setError] = useState<Error>()
+  const [loading, setLoading] = useState<boolean>(false)
   const router = useRouter()
   const form = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
   })
 
   const onSubmit: SubmitHandler<SignInInput> = async ({ username, password }) => {
-    setIsLoading(true)
+    setLoading(true)
 
     try {
       const response = await signIn("credentials", {
@@ -40,20 +39,20 @@ export function SignInForm() {
       router.push("/")
       router.refresh()
     } catch (error) {
-      setError(error as Error)
+      form.setError("root", { message: (error as Error).message })
     } finally {
-      setIsLoading(false)
+      setLoading(false)
     }
   }
 
   return (
     <Form {...form}>
       <form noValidate autoComplete="off" onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
-        {error && (
+        {form.formState.errors.root && (
           <Alert variant="destructive">
             <CircleAlert className="h-4 w-4" />
             <AlertTitle>Uh oh, there was an issue signing in</AlertTitle>
-            <AlertDescription>{error.message}</AlertDescription>
+            <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
           </Alert>
         )}
         <FormField
@@ -83,8 +82,8 @@ export function SignInForm() {
           )}
         />
         <div className="pt-2">
-          <Button disabled={isLoading} type="submit" className="w-full">
-            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          <Button disabled={loading} type="submit" className="w-full">
+            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Sign In
             <ArrowRight className="ml-[2px] mt-[0.5px] h-4 w-4" />
           </Button>

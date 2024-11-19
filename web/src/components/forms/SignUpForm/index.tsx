@@ -1,11 +1,10 @@
 "use client"
 
-import { useApolloClient } from "@apollo/client"
+import { useMutation } from "@apollo/client"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ArrowRight, CircleAlert, Loader2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { signIn } from "next-auth/react"
-import { useState } from "react"
 import { SubmitHandler, useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -19,27 +18,26 @@ import { useToast } from "@/hooks/use-toast"
 import { SignUpInput, signUpSchema } from "@/lib/validations/auth"
 
 export function SignUpForm() {
+  const [signUp, { loading }] = useMutation(SignUpDocument)
   const { toast } = useToast()
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [error, setError] = useState<Error>()
-  const router = useRouter()
-  const apolloClient = useApolloClient()
   const form = useForm<z.infer<typeof signUpSchema>>({
     resolver: zodResolver(signUpSchema),
   })
+  const router = useRouter()
 
   const onSubmit: SubmitHandler<SignUpInput> = async ({ username, email, password }) => {
-    setIsLoading(true)
-
     try {
-      await apolloClient.mutate({
-        mutation: SignUpDocument,
+      const { data: mutation } = await signUp({
         variables: {
           username,
           email,
           password,
         },
       })
+
+      if (!mutation?.createAccount?.success) {
+        throw new Error(mutation?.createAccount?.message)
+      }
 
       const response = await signIn("credentials", {
         redirect: false,
@@ -48,27 +46,25 @@ export function SignUpForm() {
       })
 
       if (!response?.ok) {
-        throw new Error("Issue signing in after sign up")
+        throw new Error("Unable to automatically sign in")
       }
 
       router.refresh()
 
       toast({ title: "Account Created", description: "You have been signed in automatically" })
     } catch (error) {
-      setError(error as Error)
-    } finally {
-      setIsLoading(false)
+      form.setError("root", { message: (error as Error).message })
     }
   }
 
   return (
     <Form {...form}>
       <form noValidate autoComplete="off" onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
-        {error && (
+        {form.formState.errors.root && (
           <Alert variant="destructive">
             <CircleAlert className="h-4 w-4" />
             <AlertTitle>Uh oh, there was an issue signing up</AlertTitle>
-            <AlertDescription>{error.message}</AlertDescription>
+            <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
           </Alert>
         )}
         <FormField
@@ -111,8 +107,8 @@ export function SignUpForm() {
           )}
         />
         <div className="pt-2">
-          <Button disabled={isLoading} type="submit" className="w-full">
-            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          <Button disabled={loading} type="submit" className="w-full">
+            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Sign Up
             <ArrowRight className="ml-[2px] mt-[0.5px] h-4 w-4" />
           </Button>

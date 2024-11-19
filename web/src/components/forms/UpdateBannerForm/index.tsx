@@ -1,11 +1,10 @@
 "use client"
 
-import { useApolloClient } from "@apollo/client"
+import { useMutation } from "@apollo/client"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { CircleAlert, Loader2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
-import { useState } from "react"
 import { SubmitHandler, useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -21,55 +20,48 @@ interface UpdateBannerFormProps {
 }
 
 export function UpdateBannerForm({ setModalOpen }: UpdateBannerFormProps) {
+  const [updateAccount, { loading }] = useMutation(UpdateAccountDocument)
   const { data: session, update: updateSession } = useSession()
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [error, setError] = useState<Error>()
   const router = useRouter()
-  const apolloClient = useApolloClient()
   const form = useForm<z.infer<typeof updateBannerSchema>>({
     resolver: zodResolver(updateBannerSchema),
   })
 
   const onSubmit: SubmitHandler<UpdateBannerInput> = async ({ banner }) => {
-    setIsLoading(true)
-
     try {
-      const { data } = await apolloClient.mutate({
-        mutation: UpdateAccountDocument,
+      const { data: mutation } = await updateAccount({
         variables: {
           banner,
         },
       })
 
-      if (!data?.updateAccount?.success) {
-        throw new Error(data?.updateAccount?.message)
+      if (!mutation?.updateAccount?.success) {
+        throw new Error(mutation?.updateAccount?.message)
       }
 
       await updateSession({
         ...session,
         userAttributes: {
           ...session?.userAttributes,
-          bannerUrl: data.updateAccount.user?.bannerUrl,
+          bannerUrl: mutation.updateAccount.user?.bannerUrl,
         },
       })
 
       setModalOpen(false)
       router.refresh()
     } catch (error) {
-      setError(error as Error)
-    } finally {
-      setIsLoading(false)
+      form.setError("root", { message: (error as Error).message })
     }
   }
 
   return (
     <Form {...form}>
       <form noValidate autoComplete="off" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        {error && (
+        {form.formState.errors.root && (
           <Alert variant="destructive">
             <CircleAlert className="h-4 w-4" />
             <AlertTitle>There was an issue updating your avatar</AlertTitle>
-            <AlertDescription>{error.message}</AlertDescription>
+            <AlertDescription>{form.formState.errors.root?.message}</AlertDescription>
           </Alert>
         )}
         <FormField
@@ -94,8 +86,8 @@ export function UpdateBannerForm({ setModalOpen }: UpdateBannerFormProps) {
           <Button onClick={() => setModalOpen(false)} variant="secondary" type="button" className="w-full md:w-fit">
             Cancel
           </Button>
-          <Button disabled={isLoading} className="w-full md:w-fit">
-            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          <Button disabled={loading} className="w-full md:w-fit">
+            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Save
           </Button>
         </div>
