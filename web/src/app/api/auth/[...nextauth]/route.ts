@@ -5,11 +5,11 @@ import type { JWT } from 'next-auth/jwt'
 import CredentialsProvider from 'next-auth/providers/credentials'
 
 import { RefreshTokenDocument, SignInDocument } from '@/graphql/__generated__/operations'
-import { getClient } from '@/lib/apollo'
+import { getApolloClient } from '@/lib/apollo'
 
 async function refreshAccessToken(token: JWT): Promise<JWT> {
   try {
-    const { data } = await getClient().mutate({
+    const { data } = await getApolloClient().mutate({
       mutation: RefreshTokenDocument,
       variables: {
         refreshToken: token.user.tokens.refresh,
@@ -47,7 +47,7 @@ export const authOptions: AuthOptions = {
       },
       async authorize(credentials) {
         try {
-          const { data } = await getClient().mutate({
+          const { data } = await getApolloClient().mutate({
             mutation: SignInDocument,
             variables: {
               username: credentials?.username || '',

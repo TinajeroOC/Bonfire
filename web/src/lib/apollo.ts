@@ -1,15 +1,32 @@
-import { HttpLink } from '@apollo/client'
+import { ApolloLink, HttpLink } from '@apollo/client'
 import {
   ApolloClient,
   InMemoryCache,
   registerApolloClient,
 } from '@apollo/experimental-nextjs-app-support'
+import { getServerSession } from 'next-auth'
 
-export const { getClient, query, PreloadQuery } = registerApolloClient(() => {
+import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { setContext } from '@apollo/client/link/context'
+
+export const { getClient: getApolloClient } = registerApolloClient(() => {
+  const authLink = setContext(async () => {
+    const session = await getServerSession(authOptions)
+
+    return {
+      headers: {
+        Authorization: session?.accessToken ? `JWT ${session.accessToken}` : '',
+      },
+    }
+  })
+
   return new ApolloClient({
     cache: new InMemoryCache(),
-    link: new HttpLink({
-      uri: process.env.NEXT_PUBLIC_APOLLO_SERVER_URI,
-    }),
+    link: ApolloLink.from([
+      authLink,
+      new HttpLink({
+        uri: process.env.NEXT_PUBLIC_APOLLO_SERVER_URI,
+      }),
+    ]),
   })
 })
