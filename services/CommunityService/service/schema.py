@@ -12,9 +12,9 @@ from .models import Community
 class CommunityType(DjangoObjectType):
     icon_url = graphene.String()
     banner_url = graphene.String()
-    member_count = graphene.Int()
-    is_member = graphene.Boolean()
-    is_owner = graphene.Boolean()
+    member_count = graphene.Int(required=True)
+    is_member = graphene.Boolean(required=True)
+    is_owner = graphene.Boolean(required=True)
 
     def resolve_icon_url(self, info):
         if self.icon:
