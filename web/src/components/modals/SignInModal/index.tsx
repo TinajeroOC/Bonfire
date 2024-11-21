@@ -13,12 +13,15 @@ import {
   ModalTitle,
   ModalTrigger,
 } from '@/components/ui/Modal'
+import { useMediaQuery } from '@/hooks/use-media-query'
 
 export function SignInModal() {
+  const isDesktop = useMediaQuery('(min-width: 768px)')
+
   return (
     <Modal>
       <ModalTrigger asChild>
-        <Button className='sm:min-w-32' variant='secondary'>
+        <Button className='sm:min-w-32' size={isDesktop ? 'default' : 'icon'} variant='outline'>
           <User2Icon className='block h-4 w-4 sm:hidden' />
           <span className='hidden sm:block'>Sign In</span>
         </Button>

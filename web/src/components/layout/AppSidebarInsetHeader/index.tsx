@@ -7,6 +7,7 @@ import { UserDropdown } from '@/components/dropdowns/UserDropdown'
 import { SignInModal } from '@/components/modals/SignInModal'
 import { SignUpModal } from '@/components/modals/SignUpModal'
 import { SidebarTrigger } from '@/components/ui/Sidebar'
+import { ThemeDropdown } from '@/components/ui/ThemeDropdown'
 
 interface AppSidebarInsetHeaderProps {
   session: Session | null
@@ -20,20 +21,17 @@ export function AppSidebarInsetHeader({ session }: AppSidebarInsetHeaderProps) {
           <SidebarTrigger className='block md:hidden' />
           <Flame className='h-6 w-6 fill-orange-600 stroke-orange-600 stroke-[3px]' />
         </div>
-        {session ? (
-          <ul className='flex w-full flex-grow basis-0 flex-row flex-nowrap items-center justify-end gap-4'>
+        <div className='flex w-full flex-grow basis-0 flex-row flex-nowrap items-center justify-end gap-2'>
+          <ThemeDropdown />
+          {session ? (
             <UserDropdown session={session} />
-          </ul>
-        ) : (
-          <ul className='flex w-full flex-grow basis-0 flex-row flex-nowrap items-center justify-end gap-4'>
-            <li>
-              <SignUpModal />
-            </li>
-            <li>
+          ) : (
+            <>
               <SignInModal />
-            </li>
-          </ul>
-        )}
+              <SignUpModal />
+            </>
+          )}
+        </div>
       </header>
     </div>
   )

@@ -23,7 +23,7 @@ export function UserDropdown({ session }: UserDropdownProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Avatar className='h-10 w-10 rounded-sm'>
+        <Avatar className='h-10 w-10 rounded-md'>
           <AvatarImage
             src={session.userAttributes.avatarUrl ?? undefined}
             alt={session.userAttributes.username}
@@ -33,10 +33,10 @@ export function UserDropdown({ session }: UserDropdownProps) {
           </AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align='end' className='min-w-56'>
+      <DropdownMenuContent align='end' className='min-w-64'>
         <DropdownMenuLabel>
           <div className='flex items-center gap-3 py-1.5 text-left text-sm'>
-            <Avatar className='h-10 w-10 rounded-sm'>
+            <Avatar className='h-10 w-10 rounded-md'>
               <AvatarImage
                 src={session.userAttributes.avatarUrl ?? undefined}
                 alt={session.userAttributes.displayName ?? session.userAttributes.username}
