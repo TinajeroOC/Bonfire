@@ -29,7 +29,7 @@ export default async function CommunityPage({ params }: CommunityPageProps) {
   return (
     <div className='mx-auto w-full max-w-6xl p-6'>
       <CommunityHeaderCard community={communityData.community.community} />
-      <div className='mt-12 flex flex-col-reverse gap-4 md:flex-row'>
+      <div className='mt-16 flex flex-col-reverse gap-6 md:flex-row'>
         <main className='flex-grow'>
           {communityData.community.community.isPublic ||
           communityData.community.community.isOwner ? (

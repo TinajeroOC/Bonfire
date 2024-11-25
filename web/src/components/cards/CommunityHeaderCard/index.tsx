@@ -14,7 +14,7 @@ export function CommunityHeaderCard({ community }: CommunityHeaderCardProps) {
         <Image
           src={community.bannerUrl}
           alt='Community banner'
-          width={1000}
+          width={1200}
           height={400}
           className='h-20 rounded-lg border bg-secondary object-cover md:h-40'
         />

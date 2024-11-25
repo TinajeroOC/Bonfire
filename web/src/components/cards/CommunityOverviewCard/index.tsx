@@ -6,6 +6,7 @@ import { Cake, Globe, Loader2, Users } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
+import { CreatePostModal } from '@/components/modals/CreatePostModal'
 import { Button } from '@/components/ui/Button'
 import {
   Card,
@@ -24,12 +25,15 @@ import {
 import { CommunityType } from '@/graphql/__generated__/types'
 import { useToast } from '@/hooks/use-toast'
 
-interface CommunityOverviewCardProp {
+interface CommunityOverviewCardProps {
   community: CommunityType
   disableJoinButton?: boolean
 }
 
-export function CommunityOverviewCard({ community, disableJoinButton }: CommunityOverviewCardProp) {
+export function CommunityOverviewCard({
+  community,
+  disableJoinButton,
+}: CommunityOverviewCardProps) {
   const [memberCount, setMemberCount] = useState<number>(community.memberCount)
   const [isMember, setIsMember] = useState<boolean>(community.isMember)
   const [joinCommunity, { loading: joinCommunityLoading }] = useMutation(JoinCommunityDocument, {
@@ -121,7 +125,7 @@ export function CommunityOverviewCard({ community, disableJoinButton }: Communit
   return (
     <Card>
       <CardHeader>
-        <CardTitle className='flex text-sm font-bold'>{community.title}</CardTitle>
+        <CardTitle className='text-sm font-bold'>{community.title}</CardTitle>
         <CardDescription className='font-light'>{community.description}</CardDescription>
       </CardHeader>
       <CardSeparator />
@@ -142,6 +146,7 @@ export function CommunityOverviewCard({ community, disableJoinButton }: Communit
       <CardSeparator />
       <CardFooter className='flex flex-col gap-2 pt-6'>
         {!disableJoinButton && renderMembershipButton()}
+        {isMember && <CreatePostModal />}
       </CardFooter>
     </Card>
   )
