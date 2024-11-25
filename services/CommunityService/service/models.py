@@ -1,4 +1,4 @@
-from django.core.validators import RegexValidator
+from django.core.validators import RegexValidator, MinLengthValidator
 from django.db import models
 from typing import List
 
@@ -13,9 +13,12 @@ class Community(models.Model):
             regex=r'^[a-zA-Z0-9]+$',
             message="Name must contain only letters and numbers.",
             code='invalid_name'
-        )
+        ),
+        MinLengthValidator(
+            3, message="Name must be at least 3 characters long")
     ])
-    title = models.CharField(max_length=50)
+    title = models.CharField(max_length=50, validators=[MinLengthValidator(
+        3, message="Title must be at least 3 characters long")])
     description = models.TextField(max_length=500)
     date_created = models.DateTimeField(auto_now_add=True)
     is_public = models.BooleanField(default=True)

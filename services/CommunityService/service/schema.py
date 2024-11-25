@@ -327,10 +327,24 @@ class DeleteCommunity(graphene.Mutation):
             )
 
 
+class CommunityMembershipType(graphene.Enum):
+    OWNER = "owner"
+    MEMBER = "member"
+    NON_MEMBER = "non_member"
+    ANY = "any"
+
+
+class CommunityStatus(graphene.Enum):
+    PUBLIC = "public"
+    PRIVATE = "private"
+    ANY = "any"
+
+
 class CommunitiesResponse(graphene.ObjectType):
     success = graphene.Boolean(required=True)
     message = graphene.String(required=True)
-    communities = graphene.List(CommunityType)
+    communities = graphene.NonNull(
+        graphene.List(graphene.NonNull(CommunityType)))
 
 
 class CommunityResponse(graphene.ObjectType):
@@ -341,8 +355,9 @@ class CommunityResponse(graphene.ObjectType):
 
 class CommunitiesFilter(graphene.InputObjectType):
     name = graphene.String(required=False)
-    is_member_only = graphene.Boolean(default_value=False)
-    include_private = graphene.Boolean(default_value=True)
+    membership_type = CommunityMembershipType(
+        default_value=CommunityMembershipType.ANY)
+    community_status = CommunityStatus(default_value=CommunityStatus.ANY)
 
 
 class Query(graphene.ObjectType):
@@ -401,20 +416,27 @@ class Query(graphene.ObjectType):
                 user_id = info.context.user['id']
 
             if filter:
-                if filter.is_member_only and user_id:
-                    queryset = queryset.filter(
-                        communitymembership__user_id=user_id)
-                if not filter.include_private:
-                    queryset = queryset.filter(is_public=True)
                 if filter.name:
                     queryset = queryset.filter(Q(name__icontains=filter.name))
-            else:
-                queryset = queryset.filter(is_public=True)
+
+                if filter.community_status == CommunityStatus.PUBLIC:
+                    queryset = queryset.filter(is_public=True)
+                elif filter.community_status == CommunityStatus.PRIVATE:
+                    queryset = queryset.filter(is_public=False)
+
+                if filter.membership_type == CommunityMembershipType.MEMBER and user_id:
+                    queryset = queryset.filter(
+                        communitymembership__user_id=user_id)
+                elif filter.membership_type == CommunityMembershipType.NON_MEMBER and user_id:
+                    queryset = queryset.exclude(
+                        communitymembership__user_id=user_id)
+                elif filter.membership_type == CommunityMembershipType.OWNER and user_id:
+                    queryset = queryset.filter(owner_id=user_id)
 
             return CommunitiesResponse(
                 success=True,
                 message="Communities retrieved successfully",
-                communities=queryset
+                communities=list(queryset)
             )
         except Exception as e:
             return CommunitiesResponse(
