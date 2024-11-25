@@ -1,4 +1,5 @@
 import { ApolloLink, HttpLink } from '@apollo/client'
+import { setContext } from '@apollo/client/link/context'
 import {
   ApolloClient,
   InMemoryCache,
@@ -7,7 +8,6 @@ import {
 import { getServerSession } from 'next-auth'
 
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
-import { setContext } from '@apollo/client/link/context'
 
 export const { getClient: getApolloClient } = registerApolloClient(() => {
   const authLink = setContext(async () => {

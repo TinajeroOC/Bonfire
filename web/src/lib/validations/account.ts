@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const updateAvatarSchema = z.object({
+export const accountAvatarSchema = z.object({
   avatar: z
     .instanceof(File)
     .refine(
@@ -9,9 +9,9 @@ export const updateAvatarSchema = z.object({
     ),
 })
 
-export type UpdateAvatarInput = z.infer<typeof updateAvatarSchema>
+export type AccountAvatarInput = z.infer<typeof accountAvatarSchema>
 
-export const updateBannerSchema = z.object({
+export const accountBannerSchema = z.object({
   banner: z
     .instanceof(File)
     .refine(
@@ -20,9 +20,9 @@ export const updateBannerSchema = z.object({
     ),
 })
 
-export type UpdateBannerInput = z.infer<typeof updateBannerSchema>
+export type AccountBannerInput = z.infer<typeof accountBannerSchema>
 
-export const updateEmailSchema = z
+export const accountEmailSchema = z
   .object({
     newEmail: z.string().email(),
     confirmNewEmail: z.string().email(),
@@ -32,21 +32,21 @@ export const updateEmailSchema = z
     path: ['confirmNewEmail'],
   })
 
-export type updateEmailInput = z.infer<typeof updateEmailSchema>
+export type AccountEmailInput = z.infer<typeof accountEmailSchema>
 
-export const updateDisplayNameSchema = z.object({
+export const accountDisplayNameSchema = z.object({
   displayName: z.string().max(30, 'Display name must be 30 characters or fewer').optional(),
 })
 
-export type UpdateDisplayNameInput = z.infer<typeof updateDisplayNameSchema>
+export type AccountDisplayNameInput = z.infer<typeof accountDisplayNameSchema>
 
-export const updateDescriptionSchema = z.object({
+export const accountDescriptionSchema = z.object({
   description: z.string().max(200, 'Description must be 200 characters or fewer').optional(),
 })
 
-export type UpdateDescriptionInput = z.infer<typeof updateDescriptionSchema>
+export type AccountDescriptionInput = z.infer<typeof accountDescriptionSchema>
 
-export const updatePasswordSchema = z
+export const accountPasswordSchema = z
   .object({
     currentPassword: z.string(),
     newPassword: z.string(),
@@ -57,7 +57,7 @@ export const updatePasswordSchema = z
     path: ['confirmNewPassword'],
   })
 
-export type UpdatePasswordInput = z.infer<typeof updatePasswordSchema>
+export type AccountPasswordInput = z.infer<typeof accountPasswordSchema>
 
 export const deleteAccountSchema = z.object({
   username: z.string(),

@@ -34,10 +34,10 @@ export default async function RootLayout({ children }: RootLayoutProps) {
           <ApolloProvider>
             <ThemeProvider attribute='class' defaultTheme='system' enableSystem>
               <SidebarProvider>
-                <AppSidebar />
+                <AppSidebar session={session} />
                 <SidebarInset>
                   <AppSidebarInsetHeader session={session} />
-                  <div className='flex h-dvh flex-col'>{children}</div>
+                  {children}
                 </SidebarInset>
               </SidebarProvider>
               <Toaster />

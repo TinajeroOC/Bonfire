@@ -6,7 +6,6 @@ import { CircleAlert, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { signOut } from 'next-auth/react'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { z } from 'zod'
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/Alert'
 import { Button } from '@/components/ui/Button'
@@ -23,21 +22,25 @@ interface DeleteAccountFormProps {
 export function DeleteAccountForm({ setModalOpen }: DeleteAccountFormProps) {
   const [deleteAccount, { loading }] = useMutation(DeleteAccountDocument)
   const router = useRouter()
-  const form = useForm<z.infer<typeof deleteAccountSchema>>({
+  const form = useForm<DeleteAccountInput>({
     resolver: zodResolver(deleteAccountSchema),
+    defaultValues: {
+      username: '',
+      password: '',
+    },
   })
 
   const onSubmit: SubmitHandler<DeleteAccountInput> = async ({ username, password }) => {
     try {
-      const { data: mutation } = await deleteAccount({
+      const { data: deleteAccountData } = await deleteAccount({
         variables: {
           username,
           password,
         },
       })
 
-      if (!mutation?.deleteAccount?.success) {
-        throw new Error(mutation?.deleteAccount?.message)
+      if (!deleteAccountData?.deleteAccount?.success) {
+        throw new Error(deleteAccountData?.deleteAccount?.message)
       }
 
       await signOut()
@@ -58,7 +61,7 @@ export function DeleteAccountForm({ setModalOpen }: DeleteAccountFormProps) {
         {form.formState.errors.root && (
           <Alert variant='destructive'>
             <CircleAlert className='h-4 w-4' />
-            <AlertTitle>There was an issue updating your avatar</AlertTitle>
+            <AlertTitle>There was an issue deleting your account</AlertTitle>
             <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
           </Alert>
         )}
@@ -68,7 +71,7 @@ export function DeleteAccountForm({ setModalOpen }: DeleteAccountFormProps) {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input {...field} value={field.value ?? ''} placeholder='Username' />
+                <Input {...field} placeholder='Username' />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -80,7 +83,7 @@ export function DeleteAccountForm({ setModalOpen }: DeleteAccountFormProps) {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <PasswordInput {...field} value={field.value ?? ''} placeholder='Password' />
+                <PasswordInput {...field} placeholder='Password' />
               </FormControl>
               <FormMessage />
             </FormItem>

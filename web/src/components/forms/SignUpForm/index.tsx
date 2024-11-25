@@ -2,11 +2,10 @@
 
 import { useMutation } from '@apollo/client'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowRight, CircleAlert, Loader2 } from 'lucide-react'
+import { ChevronRight, CircleAlert, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { signIn } from 'next-auth/react'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { z } from 'zod'
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/Alert'
 import { Button } from '@/components/ui/Button'
@@ -27,14 +26,19 @@ import { SignUpInput, signUpSchema } from '@/lib/validations/auth'
 export function SignUpForm() {
   const [signUp, { loading }] = useMutation(SignUpDocument)
   const { toast } = useToast()
-  const form = useForm<z.infer<typeof signUpSchema>>({
+  const form = useForm<SignUpInput>({
     resolver: zodResolver(signUpSchema),
+    defaultValues: {
+      email: '',
+      username: '',
+      password: '',
+    },
   })
   const router = useRouter()
 
   const onSubmit: SubmitHandler<SignUpInput> = async ({ username, email, password }) => {
     try {
-      const { data: mutation } = await signUp({
+      const { data: signUpData } = await signUp({
         variables: {
           username,
           email,
@@ -42,8 +46,8 @@ export function SignUpForm() {
         },
       })
 
-      if (!mutation?.createAccount?.success) {
-        throw new Error(mutation?.createAccount?.message)
+      if (!signUpData?.createAccount?.success) {
+        throw new Error(signUpData?.createAccount?.message)
       }
 
       const response = await signIn('credentials', {
@@ -75,7 +79,7 @@ export function SignUpForm() {
         {form.formState.errors.root && (
           <Alert variant='destructive'>
             <CircleAlert className='h-4 w-4' />
-            <AlertTitle>Uh oh, there was an issue signing up</AlertTitle>
+            <AlertTitle>There was an issue signing up</AlertTitle>
             <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
           </Alert>
         )}
@@ -86,7 +90,7 @@ export function SignUpForm() {
             <FormItem>
               <FormLabel>Username</FormLabel>
               <FormControl>
-                <Input {...field} value={field.value ?? ''} />
+                <Input {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -99,7 +103,7 @@ export function SignUpForm() {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input {...field} value={field.value ?? ''} />
+                <Input {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -112,7 +116,7 @@ export function SignUpForm() {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <PasswordInput {...field} value={field.value ?? ''} />
+                <PasswordInput {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -122,7 +126,7 @@ export function SignUpForm() {
           <Button disabled={loading} type='submit' className='w-full'>
             {loading && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
             Sign Up
-            <ArrowRight className='ml-[2px] mt-[0.5px] h-4 w-4' />
+            <ChevronRight className='ml-[2px] mt-[0.5px] h-4 w-4' />
           </Button>
         </div>
       </form>

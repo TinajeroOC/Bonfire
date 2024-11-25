@@ -1,5 +1,6 @@
 'use client'
 
+import { ChevronRight, LucideIcon } from 'lucide-react'
 import * as React from 'react'
 
 import {
@@ -54,6 +55,51 @@ const ModalTrigger = ({ className, children, ...props }: ModalProps) => {
 
   return (
     <ModalTrigger className={className} {...props}>
+      {children}
+    </ModalTrigger>
+  )
+}
+
+interface ModalLabeledTriggerProps {
+  icon: LucideIcon
+  label: string
+  description?: string
+  className?: string
+  children?: React.ReactNode
+}
+
+const ModalLabeledTrigger = ({
+  icon: Icon,
+  label,
+  description,
+  className = '',
+  children,
+  ...props
+}: ModalLabeledTriggerProps) => {
+  return (
+    <ModalTrigger
+      className={ny(
+        'w-full rounded-lg border px-6 py-0.5 transition-colors hover:bg-secondary',
+        className
+      )}
+      {...props}
+    >
+      <div className='flex justify-between gap-2 py-2'>
+        <div className='flex items-center gap-4'>
+          <Icon />
+          <span className='flex shrink flex-col items-start gap-1'>
+            <span className='text-left text-sm font-semibold'>{label}</span>
+            {description && (
+              <span className='text-left text-xs font-light text-muted-foreground'>
+                {description}
+              </span>
+            )}
+          </span>
+        </div>
+        <span className='flex shrink-0 items-center'>
+          <ChevronRight className='h-6 w-6' />
+        </span>
+      </div>
       {children}
     </ModalTrigger>
   )
@@ -141,6 +187,7 @@ export {
   ModalDescription,
   ModalFooter,
   ModalHeader,
+  ModalLabeledTrigger,
   ModalTitle,
   ModalTrigger,
 }
