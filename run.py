@@ -10,7 +10,8 @@ running = True
 
 SERVICE_PORTS = {
     'AccountService': 8000,
-    'CommunityService': 8001
+    'CommunityService': 8001,
+    'PostService': 8002
 }
 
 DEFAULT_PORT = 8080
