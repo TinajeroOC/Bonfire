@@ -1,0 +1,33 @@
+query Post($postId: ID!) {
+  post(id: $postId) {
+    success
+    message
+    post {
+      id
+      title
+      body
+      posterId
+      communityId
+      createdAt
+      updatedAt
+      isPoster
+    }
+  }
+}
+
+query Posts($userId: ID, $communityId: String) {
+  posts(userId: $userId, communityId: $communityId) {
+    success
+    message
+    posts {
+      id
+      title
+      body
+      posterId
+      communityId
+      createdAt
+      updatedAt
+      isPoster
+    }
+  }
+}

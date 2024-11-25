@@ -6,6 +6,8 @@ from graphql_jwt.decorators import login_required
 from graphql_jwt.shortcuts import create_refresh_token, get_token
 from graphene_file_upload.scalars import Upload
 from .models import User
+from .graphql.client import get_post_service_server_client
+from .graphql.documents import delete_user_posts_document
 
 
 class UserType(DjangoObjectType):
@@ -180,6 +182,16 @@ class DeleteAccount(graphene.Mutation):
 
         if not user.check_password(password):
             return DeleteAccount(success=False, message="Password is incorrect")
+
+        delete_posts_data = get_post_service_server_client().execute(delete_user_posts_document, {
+            "userId": user.id
+        })
+
+        if not delete_posts_data['deletePosts']['success']:
+            return DeleteAccount(
+                success=False,
+                message="Unable to delete user posts"
+            )
 
         user.delete()
 

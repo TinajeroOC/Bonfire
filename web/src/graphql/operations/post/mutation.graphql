@@ -1,0 +1,40 @@
+mutation CreatePost($communityId: String!, $title: String!, $body: String!) {
+  createPost(communityId: $communityId, title: $title, body: $body) {
+    success
+    message
+    post {
+      id
+      title
+      body
+      posterId
+      communityId
+      createdAt
+      updatedAt
+      isPoster
+    }
+  }
+}
+
+mutation UpdatePost($postId: ID!, $title: String, $body: String!) {
+  updatePost(postId: $postId, title: $title, body: $body) {
+    success
+    message
+    post {
+      id
+      title
+      body
+      posterId
+      communityId
+      createdAt
+      updatedAt
+      isPoster
+    }
+  }
+}
+
+mutation DeletePost($postId: ID!) {
+  deletePost(postId: $postId) {
+    success
+    message
+  }
+}

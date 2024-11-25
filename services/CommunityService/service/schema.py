@@ -7,6 +7,8 @@ from django.db import IntegrityError
 from django.db.models import Q
 from core.decorators import login_required
 from .models import Community
+from .graphql.client import get_post_service_server_client
+from .graphql.documents import delete_community_posts_document
 
 
 class CommunityType(DjangoObjectType):
@@ -303,6 +305,16 @@ class DeleteCommunity(graphene.Mutation):
                     message="Only the community owner can delete the community"
                 )
 
+            delete_posts_data = get_post_service_server_client().execute(delete_community_posts_document, {
+                "communityId": community_id
+            })
+
+            if not delete_posts_data['deletePosts']['success']:
+                return DeleteCommunity(
+                    success=False,
+                    message="Unable to delete community posts"
+                )
+
             if community.icon:
                 community.icon.delete(save=False)
             if community.banner:
@@ -389,12 +401,13 @@ class Query(graphene.ObjectType):
             if info.context.user is not None:
                 user_id = info.context.user['id']
 
-            if community.is_public or (user_id and community.is_member(user_id)):
+            if community.is_public or (user_id and community.is_member(user_id)) or (user_id and community.is_owner(user_id)):
                 return CommunityResponse(
                     success=True,
                     message="Community retrieved successfully",
                     community=community
                 )
+
             return CommunityResponse(
                 success=False,
                 message="You don't have access to this community",
