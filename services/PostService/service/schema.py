@@ -137,10 +137,10 @@ class DeletePosts(graphene.Mutation):
 
             message = f"Successfully deleted {deleted_count} posts"
 
-            return DeletePosts(success=True, message=message, deleted_count=deleted_count)
+            return DeletePosts(success=True, message=message)
 
         except Exception as e:
-            return DeletePosts(success=False, message=f"Failed to delete posts: {str(e)}", deleted_count=0)
+            return DeletePosts(success=False, message=f"Failed to delete posts: {str(e)}")
 
 
 class PostResponse(graphene.ObjectType):
