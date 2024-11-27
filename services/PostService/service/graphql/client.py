@@ -8,11 +8,11 @@ load_dotenv()
 
 
 def get_community_service_client(token=None):
-    api_url = os.getenv('COMMUNITY_SERVICE_API_URI')
+    api_url = os.getenv('COMMUNITY_SERVICE_API_URL')
 
     if not api_url:
         raise ValueError(
-            "COMMUNITY_SERVICE_API_URI not set in environment variables")
+            "COMMUNITY_SERVICE_API_URL not set in environment variables")
 
     headers = {}
     if token:
