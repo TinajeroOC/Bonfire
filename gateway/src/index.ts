@@ -37,6 +37,7 @@ async function startApolloServer() {
         { name: "Account Service", url: "http://127.0.0.1:8000/graphql/" },
         { name: "Community Service", url: "http://127.0.0.1:8001/graphql/" },
         { name: "Post Service", url: "http://127.0.0.1:8002/graphql/" },
+        { name: "Comment Service", url: "http://127.0.0.1:8003/graphql/" },
       ],
     }),
     buildService: ({ url }) =>
