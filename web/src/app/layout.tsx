@@ -3,6 +3,8 @@ import './globals.css'
 import { GeistSans } from 'geist/font/sans'
 import type { Metadata } from 'next'
 import { getServerSession } from 'next-auth'
+import NextTopLoader from 'nextjs-toploader'
+import colors from 'tailwindcss/colors'
 
 import { AppSidebar } from '@/components/layout/AppSidebar'
 import { AppSidebarInsetHeader } from '@/components/layout/AppSidebarInsetHeader'
@@ -33,6 +35,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
         <AuthProvider>
           <ApolloProvider>
             <ThemeProvider attribute='class' defaultTheme='system' enableSystem>
+              <NextTopLoader color={colors.orange['500']} height={2} showSpinner={false} />
               <SidebarProvider>
                 <AppSidebar session={session} />
                 <SidebarInset>
