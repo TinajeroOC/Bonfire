@@ -1,26 +1,36 @@
 import graphene
 from graphene_django import DjangoObjectType
-from graphene_federation import LATEST_VERSION, build_schema, key
+from graphene_federation import LATEST_VERSION, build_schema, extends, key
 from core.decorators import login_required, server_only
 from .models import Post
-from .graphql.documents import community_document
-from .graphql.client import get_community_service_client
+from .graphql.documents import community_document, comments_document, delete_post_comments_document
+from .graphql.client import get_comment_service_client, get_community_service_client, get_comment_service_server_client
 
 
 @key("id")
+@extends
 class UserType(graphene.ObjectType):
     id = graphene.ID(required=True)
 
 
 @key("id")
+@extends
 class CommunityType(graphene.ObjectType):
     id = graphene.ID(required=True)
 
 
+@key("id")
+@extends
+class CommentType(graphene.ObjectType):
+    id = graphene.ID(required=True)
+
+
+@key("id")
 class PostType(DjangoObjectType):
     is_poster = graphene.Boolean()
     user = graphene.Field(UserType)
     community = graphene.Field(CommunityType)
+    comments = graphene.List(graphene.NonNull(CommentType))
 
     def resolve_is_poster(self, info):
         if info.context.user is not None:
@@ -33,6 +43,15 @@ class PostType(DjangoObjectType):
     def resolve_user(self, info):
         return UserType(id=self.poster_id)
 
+    def resolve_comments(self, info):
+        comments_data = get_comment_service_client(token=info.context.headers.get('Authorization')).execute(comments_document, {
+            "postId": self.id
+        })
+        return comments_data["comments"]["comments"]
+
+    def __resolve_reference(self, info, **kwargs):
+        return Post.objects.get(id=self.id)
+
     class Meta:
         model = Post
 
@@ -43,7 +62,7 @@ class CreatePost(graphene.Mutation):
     post = graphene.Field(PostType)
 
     class Arguments:
-        community_id = graphene.String(required=True)
+        community_id = graphene.ID(required=True)
         title = graphene.String(required=True)
         body = graphene.String()
 
@@ -122,6 +141,16 @@ class DeletePost(graphene.Mutation):
             if post.poster_id != info.context.user['id']:
                 return DeletePost(success=False, message="You do not have permission to delete this post")
 
+            delete_comments_data = get_comment_service_server_client().execute(delete_post_comments_document, {
+                "postId": post_id
+            })
+
+            if not delete_comments_data['deleteComments']['success']:
+                return DeletePost(
+                    success=False,
+                    message="Unable to delete post comments"
+                )
+
             post.delete()
 
             return DeletePost(success=True, message="Post deleted successfully")
@@ -136,7 +165,7 @@ class DeletePosts(graphene.Mutation):
     message = graphene.String(required=True)
 
     class Arguments:
-        community_id = graphene.String()
+        community_id = graphene.ID()
         user_id = graphene.ID()
 
     @server_only

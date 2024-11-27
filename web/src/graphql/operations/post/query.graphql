@@ -1,5 +1,5 @@
-query Post($postId: ID!) {
-  post(id: $postId) {
+query Post($id: ID!) {
+  post(id: $id) {
     success
     message
     post {
@@ -26,6 +26,31 @@ query Post($postId: ID!) {
         banner
         avatarUrl
         bannerUrl
+      }
+      comments {
+        id
+        commenterId
+        postId
+        body
+        createdAt
+        updatedAt
+        isCommenter
+        user {
+          id
+          lastLogin
+          isSuperuser
+          isStaff
+          isActive
+          dateJoined
+          username
+          email
+          displayName
+          description
+          avatar
+          banner
+          avatarUrl
+          bannerUrl
+        }
       }
     }
   }

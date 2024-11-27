@@ -29,7 +29,7 @@ export default async function CommentsPage({ params }: CommentsPageProps) {
     apolloClient.query({
       query: PostDocument,
       variables: {
-        postId,
+        id: postId,
       },
     }),
     getServerSession(authOptions),

@@ -1,0 +1,70 @@
+mutation CreateComment($postId: ID!, $body: String!) {
+  createComment(postId: $postId, body: $body) {
+    success
+    message
+    comment {
+      id
+      commenterId
+      postId
+      body
+      createdAt
+      updatedAt
+      isCommenter
+      user {
+        id
+        lastLogin
+        isSuperuser
+        isStaff
+        isActive
+        dateJoined
+        username
+        email
+        displayName
+        description
+        avatar
+        banner
+        avatarUrl
+        bannerUrl
+      }
+    }
+  }
+}
+
+mutation UpdateComment($commentId: ID!, $body: String!) {
+  updateComment(commentId: $commentId, body: $body) {
+    success
+    message
+    comment {
+      id
+      commenterId
+      postId
+      body
+      createdAt
+      updatedAt
+      isCommenter
+      user {
+        id
+        lastLogin
+        isSuperuser
+        isStaff
+        isActive
+        dateJoined
+        username
+        email
+        displayName
+        description
+        avatar
+        banner
+        avatarUrl
+        bannerUrl
+      }
+    }
+  }
+}
+
+mutation DeleteComment($commentId: ID!) {
+  deleteComment(commentId: $commentId) {
+    success
+    message
+  }
+}

@@ -1,0 +1,31 @@
+query Comment($id: ID!) {
+  comment(id: $id) {
+    success
+    message
+    comment {
+      id
+      commenterId
+      postId
+      body
+      createdAt
+      updatedAt
+      isCommenter
+    }
+  }
+}
+
+query UserComments($userId: ID!) {
+  comments(userId: $userId) {
+    success
+    message
+    comments {
+      id
+      commenterId
+      postId
+      body
+      createdAt
+      updatedAt
+      isCommenter
+    }
+  }
+}

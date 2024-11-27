@@ -16,3 +16,33 @@ community_document = gql(
         }
     }
     ''')
+
+comments_document = gql(
+    '''
+    query Comments($postId: ID!) {
+        comments(postId: $postId) {
+            success
+            message
+            comments {
+            id
+            body
+            postId
+            commenterId
+            updatedAt
+            createdAt
+            isCommenter
+            }
+        }
+    }
+    ''')
+
+delete_post_comments_document = gql(
+    '''
+    mutation DeleteComments($postId: ID!) {
+        deleteComments(postId: $postId) {
+            success
+            message
+        }
+    }
+    '''
+)

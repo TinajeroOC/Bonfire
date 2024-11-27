@@ -1,4 +1,4 @@
-mutation CreatePost($communityId: String!, $title: String!, $body: String!) {
+mutation CreatePost($communityId: ID!, $title: String!, $body: String!) {
   createPost(communityId: $communityId, title: $title, body: $body) {
     success
     message
