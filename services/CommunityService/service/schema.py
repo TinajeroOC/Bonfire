@@ -1,6 +1,6 @@
 import graphene
 from graphene_django import DjangoObjectType
-from graphene_federation import LATEST_VERSION, build_schema
+from graphene_federation import LATEST_VERSION, build_schema, external, key
 from graphene_file_upload.scalars import Upload
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
@@ -11,6 +11,7 @@ from .graphql.client import get_post_service_server_client
 from .graphql.documents import delete_community_posts_document
 
 
+@key("id")
 class CommunityType(DjangoObjectType):
     icon_url = graphene.String()
     banner_url = graphene.String()
@@ -40,6 +41,9 @@ class CommunityType(DjangoObjectType):
         if info.context.user is not None:
             return self.is_owner(info.context.user['id'])
         return False
+
+    def __resolve_reference(self, info, **kwargs):
+        return Community.objects.get(id=self.id)
 
     class Meta:
         model = Community

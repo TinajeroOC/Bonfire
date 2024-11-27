@@ -1,7 +1,7 @@
 import graphene
 import graphql_jwt
 from graphene_django import DjangoObjectType
-from graphene_federation import LATEST_VERSION, build_schema
+from graphene_federation import LATEST_VERSION, build_schema, external, key
 from graphql_jwt.decorators import login_required
 from graphql_jwt.shortcuts import create_refresh_token, get_token
 from graphene_file_upload.scalars import Upload
@@ -10,6 +10,7 @@ from .graphql.client import get_post_service_server_client
 from .graphql.documents import delete_user_posts_document
 
 
+@key("id")
 class UserType(DjangoObjectType):
     avatar_url = graphene.String()
     banner_url = graphene.String()
@@ -23,6 +24,9 @@ class UserType(DjangoObjectType):
         if self.banner:
             return info.context.build_absolute_uri(self.banner.url)
         return None
+
+    def __resolve_reference(self, info, **kwargs):
+        return User.objects.get(id=self.id)
 
     class Meta:
         model = User

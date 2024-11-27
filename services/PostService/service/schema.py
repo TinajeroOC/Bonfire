@@ -1,19 +1,37 @@
 import graphene
 from graphene_django import DjangoObjectType
-from graphene_federation import LATEST_VERSION, build_schema
+from graphene_federation import LATEST_VERSION, build_schema, key
 from core.decorators import login_required, server_only
 from .models import Post
 from .graphql.documents import community_document
 from .graphql.client import get_community_service_client
 
 
+@key("id")
+class UserType(graphene.ObjectType):
+    id = graphene.ID(required=True)
+
+
+@key("id")
+class CommunityType(graphene.ObjectType):
+    id = graphene.ID(required=True)
+
+
 class PostType(DjangoObjectType):
     is_poster = graphene.Boolean()
+    user = graphene.Field(UserType)
+    community = graphene.Field(CommunityType)
 
     def resolve_is_poster(self, info):
         if info.context.user is not None:
             return self.is_poster(info.context.user['id'])
         return False
+
+    def resolve_community(self, info):
+        return CommunityType(id=self.community_id)
+
+    def resolve_user(self, info):
+        return UserType(id=self.poster_id)
 
     class Meta:
         model = Post
