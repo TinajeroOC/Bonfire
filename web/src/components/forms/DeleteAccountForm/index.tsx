@@ -98,7 +98,7 @@ export function DeleteAccountForm({ setModalOpen }: DeleteAccountFormProps) {
           >
             Cancel
           </Button>
-          <Button disabled={loading} className='w-full md:w-fit'>
+          <Button disabled={loading} variant='destructive' className='w-full md:w-fit'>
             {loading && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
             Delete
           </Button>

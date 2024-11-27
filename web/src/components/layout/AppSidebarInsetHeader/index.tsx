@@ -15,7 +15,7 @@ interface AppSidebarInsetHeaderProps {
 
 export function AppSidebarInsetHeader({ session }: AppSidebarInsetHeaderProps) {
   return (
-    <div className='sticky top-0 z-10 h-auto w-full border-b bg-background'>
+    <div className='sticky top-0 z-50 h-auto w-full border-b bg-background'>
       <header className='flex h-16 w-full flex-row flex-nowrap items-center justify-between gap-4 px-6 md:px-10'>
         <div className='flex flex-row items-center gap-2 md:hidden'>
           <SidebarTrigger className='block md:hidden' />

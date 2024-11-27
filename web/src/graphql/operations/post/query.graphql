@@ -4,30 +4,111 @@ query Post($postId: ID!) {
     message
     post {
       id
-      title
-      body
       posterId
       communityId
+      title
+      body
       createdAt
       updatedAt
       isPoster
+      user {
+        id
+        lastLogin
+        isSuperuser
+        isStaff
+        isActive
+        dateJoined
+        username
+        email
+        displayName
+        description
+        avatar
+        banner
+        avatarUrl
+        bannerUrl
+      }
     }
   }
 }
 
-query Posts($userId: ID, $communityId: String) {
+query CommunityPosts($userId: ID, $communityId: String) {
   posts(userId: $userId, communityId: $communityId) {
     success
     message
     posts {
       id
-      title
-      body
       posterId
       communityId
+      title
+      body
       createdAt
       updatedAt
       isPoster
+      user {
+        id
+        lastLogin
+        isSuperuser
+        isStaff
+        isActive
+        dateJoined
+        username
+        email
+        displayName
+        description
+        avatar
+        banner
+        avatarUrl
+        bannerUrl
+      }
+    }
+  }
+}
+
+query FeedPosts($userId: ID, $communityId: String) {
+  posts(userId: $userId, communityId: $communityId) {
+    success
+    message
+    posts {
+      id
+      posterId
+      communityId
+      title
+      body
+      createdAt
+      updatedAt
+      isPoster
+      community {
+        id
+        name
+        title
+        description
+        dateCreated
+        isPublic
+        ownerId
+        icon
+        banner
+        iconUrl
+        bannerUrl
+        memberCount
+        isMember
+        isOwner
+      }
+      user {
+        id
+        lastLogin
+        isSuperuser
+        isStaff
+        isActive
+        dateJoined
+        username
+        email
+        displayName
+        description
+        avatar
+        banner
+        avatarUrl
+        bannerUrl
+      }
     }
   }
 }

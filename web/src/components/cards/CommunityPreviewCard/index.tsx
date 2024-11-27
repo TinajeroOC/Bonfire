@@ -14,15 +14,12 @@ import {
 import { CommunityType } from '@/graphql/__generated__/types'
 import { useToast } from '@/hooks/use-toast'
 
-interface CommunityDiscoverCardProps {
+interface CommunityPreviewCardProps {
   community: CommunityType
   disableJoinButton?: boolean
 }
 
-export function CommunityDiscoverCard({
-  community,
-  disableJoinButton,
-}: CommunityDiscoverCardProps) {
+export function CommunityPreviewCard({ community, disableJoinButton }: CommunityPreviewCardProps) {
   const [memberCount, setMemberCount] = useState<number>(community.memberCount)
   const [isMember, setIsMember] = useState<boolean>(community.isMember)
   const [joinCommunity] = useMutation(JoinCommunityDocument, {
@@ -89,7 +86,7 @@ export function CommunityDiscoverCard({
       <div className='flex items-center gap-3'>
         <Avatar className='h-12 w-12'>
           <AvatarImage src={community.iconUrl ?? undefined} />
-          <AvatarFallback className='bg-primary-foreground text-base md:text-lg'>b/</AvatarFallback>
+          <AvatarFallback className='text-base md:text-lg'>b/</AvatarFallback>
         </Avatar>
         <div className='flex-grow'>
           <h4 className='truncate text-sm font-semibold'>{`b/${community.name}`}</h4>

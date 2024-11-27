@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 
-import { CreateCommunityForm } from '@/components/forms/CreateCommunityForm'
+import { CreatePostForm } from '@/components/forms/CreatePostForm'
+import { Button } from '@/components/ui/Button'
 import {
   Modal,
   ModalBody,
@@ -12,20 +13,22 @@ import {
   ModalTrigger,
 } from '@/components/ui/Modal'
 
-export function CreateCommunityModal() {
+export function CreatePostModal() {
   const [open, setOpen] = useState(false)
 
   return (
     <Modal open={open} onOpenChange={setOpen}>
       <ModalTrigger asChild>
-        <span>Create a Community</span>
+        <Button variant='secondary' className='w-full'>
+          Create Post
+        </Button>
       </ModalTrigger>
       <ModalContent className='max-w-xl'>
         <ModalHeader>
-          <ModalTitle>Create a Community</ModalTitle>
+          <ModalTitle>Create Post</ModalTitle>
         </ModalHeader>
         <ModalBody>
-          <CreateCommunityForm setModalOpen={setOpen} />
+          <CreatePostForm setModalOpen={setOpen} />
         </ModalBody>
       </ModalContent>
     </Modal>

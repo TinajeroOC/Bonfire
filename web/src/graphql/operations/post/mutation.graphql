@@ -4,13 +4,45 @@ mutation CreatePost($communityId: String!, $title: String!, $body: String!) {
     message
     post {
       id
-      title
-      body
       posterId
       communityId
+      title
+      body
       createdAt
       updatedAt
       isPoster
+      community {
+        id
+        name
+        title
+        description
+        dateCreated
+        isPublic
+        ownerId
+        icon
+        banner
+        iconUrl
+        bannerUrl
+        memberCount
+        isMember
+        isOwner
+      }
+      user {
+        id
+        lastLogin
+        isSuperuser
+        isStaff
+        isActive
+        dateJoined
+        username
+        email
+        displayName
+        description
+        avatar
+        banner
+        avatarUrl
+        bannerUrl
+      }
     }
   }
 }

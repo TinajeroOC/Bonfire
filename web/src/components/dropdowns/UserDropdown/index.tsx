@@ -23,31 +23,27 @@ export function UserDropdown({ session }: UserDropdownProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Avatar className='h-10 w-10'>
+        <Avatar className='h-10 w-10 hover:cursor-pointer'>
           <AvatarImage
             src={session.userAttributes.avatarUrl ?? undefined}
             alt={session.userAttributes.username}
           />
-          <AvatarFallback className='select-none'>
-            {session.userAttributes.username[0].toUpperCase()}
-          </AvatarFallback>
+          <AvatarFallback>{session.userAttributes.username[0].toUpperCase()}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end' className='min-w-64'>
         <DropdownMenuLabel>
           <div className='flex items-center gap-3 py-1.5 text-left text-sm'>
-            <Avatar className='h-10 w-10'>
+            <Avatar className='h-10 w-10 hover:cursor-pointer'>
               <AvatarImage
                 src={session.userAttributes.avatarUrl ?? undefined}
-                alt={session.userAttributes.displayName ?? session.userAttributes.username}
+                alt={session.userAttributes.username}
               />
-              <AvatarFallback className='select-none'>
-                {session.userAttributes.username[0].toUpperCase()}
-              </AvatarFallback>
+              <AvatarFallback>{session.userAttributes.username[0].toUpperCase()}</AvatarFallback>
             </Avatar>
             <div className='grid flex-1 text-left text-sm leading-tight'>
-              <span className='truncate font-semibold'>{session.userAttributes.username}</span>
-              <span className='truncate text-xs text-muted-foreground'>
+              <span className='truncate text-sm font-bold'>{`u/${session.userAttributes.username}`}</span>
+              <span className='truncate text-xs font-normal text-muted-foreground'>
                 {session.userAttributes.email}
               </span>
             </div>

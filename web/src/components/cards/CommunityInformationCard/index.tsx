@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 
 import { CreatePostModal } from '@/components/modals/CreatePostModal'
+import { useCommunityContext } from '@/components/providers/CommunityProvider'
 import { Button } from '@/components/ui/Button'
 import {
   Card,
@@ -22,18 +23,18 @@ import {
   JoinCommunityDocument,
   LeaveCommunityDocument,
 } from '@/graphql/__generated__/operations'
-import { CommunityType } from '@/graphql/__generated__/types'
 import { useToast } from '@/hooks/use-toast'
 
-interface CommunityOverviewCardProps {
-  community: CommunityType
+interface CommunityInformationCardProps {
+  includeCommunityName?: boolean
   disableJoinButton?: boolean
 }
 
-export function CommunityOverviewCard({
-  community,
+export function CommunityInformationCard({
+  includeCommunityName,
   disableJoinButton,
-}: CommunityOverviewCardProps) {
+}: CommunityInformationCardProps) {
+  const { community } = useCommunityContext()
   const [memberCount, setMemberCount] = useState<number>(community.memberCount)
   const [isMember, setIsMember] = useState<boolean>(community.isMember)
   const [joinCommunity, { loading: joinCommunityLoading }] = useMutation(JoinCommunityDocument, {
@@ -90,7 +91,7 @@ export function CommunityOverviewCard({
     if (community.isOwner) {
       return (
         <Button asChild className='w-full' variant='secondary'>
-          <Link href={`${community.name}/settings`}>Manage Community</Link>
+          <Link href={`/b/${community.name}/settings`}>Manage Community</Link>
         </Button>
       )
     }
@@ -124,10 +125,22 @@ export function CommunityOverviewCard({
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className='text-sm font-bold'>{community.title}</CardTitle>
-        <CardDescription className='font-light'>{community.description}</CardDescription>
-      </CardHeader>
+      {includeCommunityName ? (
+        <CardHeader>
+          <Link href={`/b/${community.name}`}>
+            <CardTitle className='mb-1 flex font-bold'>{`b/${community.name}`}</CardTitle>
+          </Link>
+          <CardDescription className='font-light'>
+            <span className='block font-semibold'>{community.title}</span>
+            <span>{community.description}</span>
+          </CardDescription>
+        </CardHeader>
+      ) : (
+        <CardHeader>
+          <CardTitle className='text-sm font-bold'>{community.title}</CardTitle>
+          <CardDescription className='font-light'>{community.description}</CardDescription>
+        </CardHeader>
+      )}
       <CardSeparator />
       <CardContent className='flex flex-col gap-2 pt-6'>
         <span className='flex items-center gap-2 text-sm font-light text-muted-foreground'>
@@ -145,8 +158,8 @@ export function CommunityOverviewCard({
       </CardContent>
       <CardSeparator />
       <CardFooter className='flex flex-col gap-2 pt-6'>
-        {!disableJoinButton && renderMembershipButton()}
         {isMember && <CreatePostModal />}
+        {!disableJoinButton && renderMembershipButton()}
       </CardFooter>
     </Card>
   )

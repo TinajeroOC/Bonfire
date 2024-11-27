@@ -65,10 +65,9 @@ export function CreateCommunityForm({ setModalOpen }: CreateCommunityFormProps) 
       }
 
       router.push(`/b/${name}`)
+      setModalOpen(false)
     } catch (error) {
       form.setError('root', { message: (error as Error).message })
-    } finally {
-      setModalOpen(false)
     }
   }
 

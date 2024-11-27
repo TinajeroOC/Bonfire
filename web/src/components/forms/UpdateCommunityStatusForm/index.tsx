@@ -72,7 +72,7 @@ export function UpdateCommunityStatusForm({ setModalOpen }: UpdateCommunityStatu
         {form.formState.errors.root && (
           <Alert variant='destructive'>
             <CircleAlert className='h-4 w-4' />
-            <AlertTitle>There was an issue updating the description</AlertTitle>
+            <AlertTitle>There was an issue updating the status</AlertTitle>
             <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
           </Alert>
         )}

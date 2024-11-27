@@ -1,6 +1,6 @@
-import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
+import { BackButton } from '@/components/buttons/BackButton'
 import { CommunityDateCard } from '@/components/cards/CommunityDateCard'
 import { CommunityMemberCountCard } from '@/components/cards/CommunityMemberCountCard'
 import { CommunityStatusCard } from '@/components/cards/CommunityStatusCard'
@@ -11,26 +11,27 @@ import { UpdateCommunityIconModal } from '@/components/modals/UpdateCommunityIco
 import { UpdateCommunityStatusModal } from '@/components/modals/UpdateCommunityStatusModal'
 import { UpdateCommunityTitleModal } from '@/components/modals/UpdateCommunityTitleModal'
 import { CommunityProvider } from '@/components/providers/CommunityProvider'
-import { Button } from '@/components/ui/Button'
 import { CommunityDocument } from '@/graphql/__generated__/operations'
 import { getApolloClient } from '@/lib/apollo'
 
 interface CommunityPageProps {
-  params: Promise<{ name: string }>
+  params: Promise<{ communityName: string }>
 }
 
 export default async function CommunityPage({ params }: CommunityPageProps) {
-  const { name } = await params
+  const { communityName } = await params
 
-  const { data: communityData } = await getApolloClient().query({
+  const apolloClient = getApolloClient()
+
+  const { data: communityData } = await apolloClient.query({
     query: CommunityDocument,
     variables: {
-      name,
+      name: communityName,
     },
   })
 
   if (!communityData.community?.success || !communityData.community.community) {
-    throw new Error('Unable to get community data')
+    throw new Error(communityData.community?.message)
   }
 
   if (!communityData.community.community.isOwner) {
@@ -41,20 +42,13 @@ export default async function CommunityPage({ params }: CommunityPageProps) {
     <CommunityProvider community={communityData.community.community}>
       <div className='relative mx-auto w-full max-w-6xl p-6'>
         <main>
-          <Button
-            size='icon'
-            variant='secondary'
-            className='absolute -left-[2rem] rounded-lg max-2xl:hidden'
-            asChild
-          >
-            <Link href={`/b/${communityData.community.community.name}`}>
-              <ArrowLeft />
-            </Link>
-          </Button>
+          <BackButton />
           <div className='flex flex-col'>
-            <h1 className='mb-8 scroll-m-20 text-2xl font-extrabold tracking-tight md:text-3xl lg:text-4xl'>
-              {`b/${communityData.community.community.name}`}
-            </h1>
+            <Link href={`/b/${communityData.community.community.name}`}>
+              <h1 className='mb-8 scroll-m-20 text-2xl font-extrabold tracking-tight md:text-3xl lg:text-4xl'>
+                {`b/${communityData.community.community.name}`}
+              </h1>
+            </Link>
             <div className='flex w-full flex-col items-start gap-4'>
               <h2 className='mt-2 scroll-m-20 text-xl font-semibold tracking-tight md:text-2xl'>
                 Overview

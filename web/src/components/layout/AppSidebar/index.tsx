@@ -94,21 +94,21 @@ export function AppSidebar({ session }: AppSidebarProps) {
                           <CreateCommunityModal />
                         </SidebarMenuButton>
                       </SidebarMenuItem>
-                      {communitiesData?.communities?.communities.map((community) => (
-                        <SidebarMenuItem key={community.id}>
-                          <Link href={`/b/${community.name}`}>
-                            <SidebarMenuButton>
-                              <Avatar className='h-8 w-8'>
-                                <AvatarImage src={community.iconUrl ?? undefined} />
-                                <AvatarFallback className='bg-primary-foreground text-sm'>
-                                  b/
-                                </AvatarFallback>
-                              </Avatar>
-                              <span className='truncate text-sm'>{`b/${community.name}`}</span>
-                            </SidebarMenuButton>
-                          </Link>
-                        </SidebarMenuItem>
-                      ))}
+                      {communitiesData?.communities?.communities
+                        .filter((community) => community.isMember)
+                        .map((community) => (
+                          <SidebarMenuItem key={community.id}>
+                            <Link href={`/b/${community.name}`}>
+                              <SidebarMenuButton>
+                                <Avatar className='h-8 w-8'>
+                                  <AvatarImage src={community.iconUrl ?? undefined} />
+                                  <AvatarFallback>b/</AvatarFallback>
+                                </Avatar>
+                                <span className='truncate text-sm'>{`b/${community.name}`}</span>
+                              </SidebarMenuButton>
+                            </Link>
+                          </SidebarMenuItem>
+                        ))}
                     </SidebarMenu>
                   </SidebarGroupContent>
                 </CollapsibleContent>
