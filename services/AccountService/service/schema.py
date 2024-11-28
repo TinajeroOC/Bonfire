@@ -1,19 +1,26 @@
 import graphene
 import graphql_jwt
 from graphene_django import DjangoObjectType
-from graphene_federation import LATEST_VERSION, build_schema, external, key
+from graphene_federation import LATEST_VERSION, build_schema, extends, key
 from graphql_jwt.decorators import login_required
 from graphql_jwt.shortcuts import create_refresh_token, get_token
 from graphene_file_upload.scalars import Upload
 from .models import User
-from .graphql.client import get_post_service_server_client
-from .graphql.documents import delete_user_posts_document
+from .graphql.client import get_post_service_server_client, get_post_service_client
+from .graphql.documents import delete_user_posts_document, posts_document
+
+
+@key("id")
+@extends
+class PostType(graphene.ObjectType):
+    id = graphene.ID(required=True)
 
 
 @key("id")
 class UserType(DjangoObjectType):
     avatar_url = graphene.String()
     banner_url = graphene.String()
+    posts = graphene.List(graphene.NonNull(PostType))
 
     def resolve_avatar_url(self, info):
         if self.avatar:
@@ -24,6 +31,12 @@ class UserType(DjangoObjectType):
         if self.banner:
             return info.context.build_absolute_uri(self.banner.url)
         return None
+
+    def resolve_posts(self, info):
+        posts_data = get_post_service_client(token=info.context.headers.get('Authorization')).execute(posts_document, {
+            "userId": self.id
+        })
+        return posts_data["posts"]["posts"]
 
     def __resolve_reference(self, info, **kwargs):
         return User.objects.get(id=self.id)
@@ -202,12 +215,44 @@ class DeleteAccount(graphene.Mutation):
         return DeleteAccount(success=True, message="Successfully deleted account")
 
 
-class Query(graphene.ObjectType):
-    viewer = graphene.Field(UserType)
+class UserResponse(graphene.ObjectType):
+    success = graphene.Boolean(required=True)
+    message = graphene.String(required=True)
+    user = graphene.Field(UserType)
 
-    @login_required
-    def resolve_viewer(self, info):
-        return info.context.user
+
+class Query(graphene.ObjectType):
+    user = graphene.Field(
+        UserResponse,
+        id=graphene.ID(required=False),
+        username=graphene.String(required=False)
+    )
+
+    def resolve_user(self, info, id=None, username=None):
+        if not id and not username:
+            return UserResponse(
+                success=False,
+                message="Either 'id' or 'name' must be provided",
+                user=None
+            )
+
+        try:
+            if id:
+                user = User.objects.get(id=id)
+            else:
+                user = User.objects.get(username=username)
+
+            return UserResponse(
+                success=True,
+                message="User retrieved successfully",
+                user=user
+            )
+        except User.DoesNotExist:
+            return UserResponse(
+                success=False,
+                message="User not found",
+                user=None
+            )
 
 
 class Mutation(graphene.ObjectType):

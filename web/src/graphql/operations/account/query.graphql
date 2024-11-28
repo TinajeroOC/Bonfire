@@ -1,0 +1,47 @@
+query User($username: String) {
+  user(username: $username) {
+    success
+    message
+    user {
+      id
+      lastLogin
+      isSuperuser
+      isStaff
+      isActive
+      dateJoined
+      username
+      email
+      displayName
+      description
+      avatar
+      banner
+      avatarUrl
+      bannerUrl
+      posts {
+        id
+        posterId
+        communityId
+        title
+        body
+        createdAt
+        updatedAt
+        isPoster
+        community {
+          id
+          name
+          title
+          description
+          dateCreated
+          ownerId
+          icon
+          banner
+          iconUrl
+          bannerUrl
+          memberCount
+          isMember
+          isOwner
+        }
+      }
+    }
+  }
+}
