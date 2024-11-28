@@ -4,6 +4,7 @@ import { useMutation } from '@apollo/client'
 import dateFormat from 'dateformat'
 import { Cake, Loader2, Users } from 'lucide-react'
 import Link from 'next/link'
+import { useSession } from 'next-auth/react'
 import { useState } from 'react'
 
 import { CreatePostModal } from '@/components/modals/CreatePostModal'
@@ -48,6 +49,7 @@ export function CommunityInformationCard({
     ],
   })
   const { toast } = useToast()
+  const { data: session } = useSession()
 
   const handleCommunityJoin = async () => {
     const { data: joinCommunityData } = await joinCommunity({
@@ -152,11 +154,15 @@ export function CommunityInformationCard({
           {dateFormat(community.dateCreated, 'mmmm dS, yyyy')}
         </span>
       </CardContent>
-      <CardSeparator />
-      <CardFooter className='flex flex-col gap-2 pt-6'>
-        {isMember && <CreatePostModal />}
-        {!disableJoinButton && renderMembershipButton()}
-      </CardFooter>
+      {session && (
+        <>
+          <CardSeparator />
+          <CardFooter className='flex flex-col gap-2 pt-6'>
+            {isMember && <CreatePostModal />}
+            {!disableJoinButton && renderMembershipButton()}
+          </CardFooter>
+        </>
+      )}
     </Card>
   )
 }

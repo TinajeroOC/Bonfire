@@ -1,5 +1,5 @@
 import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu'
-import { LogOut, Settings } from 'lucide-react'
+import { LogOut, Settings, User2 } from 'lucide-react'
 import Link from 'next/link'
 import { Session } from 'next-auth'
 import { signOut } from 'next-auth/react'
@@ -50,6 +50,12 @@ export function UserDropdown({ session }: UserDropdownProps) {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        <Link href={`/u/${session.userAttributes.username}`}>
+          <DropdownMenuItem className='hover:cursor-pointer'>
+            <User2 />
+            Profile
+          </DropdownMenuItem>
+        </Link>
         <Link href='/settings'>
           <DropdownMenuItem className='hover:cursor-pointer'>
             <Settings />

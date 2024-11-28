@@ -13,9 +13,9 @@ interface FeedPostCardProps {
 export function FeedPostCard({ post }: FeedPostCardProps) {
   return (
     <div className='relative rounded-lg p-4 transition-colors duration-150 hover:bg-secondary/20'>
-      <Link href={`b/${post.community?.name}/comments/${post.id}`} className='absolute inset-0' />
+      <Link href={`/b/${post.community?.name}/comments/${post.id}`} className='absolute inset-0' />
       <span className='mb-3 flex items-center gap-2 text-sm text-muted-foreground'>
-        <Link href={`b/${post.community?.name}`} className='z-10 flex items-center gap-2'>
+        <Link href={`/b/${post.community?.name}`} className='z-10 flex items-center gap-2'>
           <Avatar className='h-8 w-8'>
             <AvatarImage src={post.community?.iconUrl ?? undefined} alt={post.community?.name} />
             <AvatarFallback className='text-white'>b/</AvatarFallback>
