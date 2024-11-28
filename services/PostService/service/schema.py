@@ -76,9 +76,6 @@ class CreatePost(graphene.Mutation):
             if not community_data["community"]["community"]:
                 return CreatePost(success=False, message="Cannot create posts in a nonexistent community")
 
-            if not community_data["community"]["community"]["isPublic"]:
-                return CreatePost(success=False, message="Cannot create posts in private communites")
-
             if not community_data["community"]["community"]["isMember"]:
                 return CreatePost(success=False, message="You must be a member of the community to post")
 
@@ -226,6 +223,7 @@ class Query(graphene.ObjectType):
                 filters['poster_id'] = user_id
 
             posts = Post.objects.filter(**filters)
+
             return PostsResponse(success=True, message="Posts retrieved successfully", posts=list(posts))
         except Exception as e:
             return PostsResponse(success=False, message=f"Failed to retrieve posts: {str(e)}", posts=[])

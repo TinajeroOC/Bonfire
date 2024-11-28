@@ -17,7 +17,6 @@ mutation CreatePost($communityId: ID!, $title: String!, $body: String!) {
         title
         description
         dateCreated
-        isPublic
         ownerId
         icon
         banner

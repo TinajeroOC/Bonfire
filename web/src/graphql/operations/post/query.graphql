@@ -108,7 +108,6 @@ query FeedPosts($userId: ID, $communityId: String) {
         title
         description
         dateCreated
-        isPublic
         ownerId
         icon
         banner

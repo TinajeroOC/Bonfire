@@ -48,26 +48,16 @@ export default async function CommunityPage({ params }: CommunityPageProps) {
       <CommunityHeaderCard community={communityData.community.community} />
       <div className='mt-16 flex flex-col-reverse gap-6 md:flex-row'>
         <main className='max-w-3xl flex-grow'>
-          {communityData.community.community.isPublic ||
-          communityData.community.community.isOwner ? (
-            <div className='flex flex-col gap-2'>
-              {postsData.posts?.posts?.map((post) => (
-                <Fragment key={post.id}>
-                  <article>
-                    <CommunityPostCard communityName={communityName} post={post} />
-                  </article>
-                  <Separator />
-                </Fragment>
-              ))}
-            </div>
-          ) : (
-            <div className='flex h-full flex-col items-center justify-center gap-2'>
-              <h3 className='font-bold'>Community is Private</h3>
-              <p className='text-sm font-light text-muted-foreground'>
-                The owner has privated this community
-              </p>
-            </div>
-          )}
+          <div className='flex flex-col gap-2'>
+            {postsData.posts?.posts?.map((post) => (
+              <Fragment key={post.id}>
+                <article>
+                  <CommunityPostCard communityName={communityName} post={post} />
+                </article>
+                <Separator />
+              </Fragment>
+            ))}
+          </div>
         </main>
         <aside className='w-full md:max-w-xs'>
           <CommunityProvider community={communityData.community.community}>

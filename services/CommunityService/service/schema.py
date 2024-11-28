@@ -58,12 +58,11 @@ class CreateCommunity(graphene.Mutation):
         name = graphene.String(required=True)
         title = graphene.String(required=True)
         description = graphene.String(required=True)
-        is_public = graphene.Boolean(default_value=True)
         icon = Upload()
         banner = Upload()
 
     @login_required
-    def mutate(self, info, name, title, description, is_public, icon=None, banner=None):
+    def mutate(self, info, name, title, description, icon=None, banner=None):
         allowed_mimetypes = ['image/jpg', 'image/jpeg', 'image/png']
 
         try:
@@ -71,7 +70,6 @@ class CreateCommunity(graphene.Mutation):
                 name=name,
                 title=title,
                 description=description,
-                is_public=is_public,
                 owner_id=info.context.user['id']
             )
 
@@ -133,15 +131,13 @@ class UpdateCommunity(graphene.Mutation):
         community_id = graphene.ID(required=True)
         title = graphene.String()
         description = graphene.String()
-        is_public = graphene.Boolean()
         icon = Upload()
         banner = Upload()
         remove_icon = graphene.Boolean(default_value=False)
         remove_banner = graphene.Boolean(default_value=False)
 
     @login_required
-    def mutate(self, info, community_id, title=None, description=None,
-               is_public=None, icon=None, banner=None, remove_icon=False, remove_banner=False):
+    def mutate(self, info, community_id, title=None, description=None, icon=None, banner=None, remove_icon=False, remove_banner=False):
         allowed_mimetypes = ['image/jpg', 'image/jpeg', 'image/png']
 
         try:
@@ -159,9 +155,6 @@ class UpdateCommunity(graphene.Mutation):
 
             if description is not None:
                 community.description = description
-
-            if is_public is not None:
-                community.is_public = is_public
 
             if remove_icon:
                 community.icon.delete(save=False)
@@ -228,12 +221,6 @@ class JoinCommunity(graphene.Mutation):
     def mutate(self, info, community_id):
         try:
             community = Community.objects.get(id=community_id)
-
-            if not community.is_public:
-                return JoinCommunity(
-                    success=False,
-                    message="This community is private"
-                )
 
             if community.is_member(info.context.user['id']):
                 return JoinCommunity(
@@ -350,12 +337,6 @@ class CommunityMembershipType(graphene.Enum):
     ANY = "any"
 
 
-class CommunityStatus(graphene.Enum):
-    PUBLIC = "public"
-    PRIVATE = "private"
-    ANY = "any"
-
-
 class CommunitiesResponse(graphene.ObjectType):
     success = graphene.Boolean(required=True)
     message = graphene.String(required=True)
@@ -373,7 +354,6 @@ class CommunitiesFilter(graphene.InputObjectType):
     name = graphene.String(required=False)
     membership_type = CommunityMembershipType(
         default_value=CommunityMembershipType.ANY)
-    community_status = CommunityStatus(default_value=CommunityStatus.ANY)
 
 
 class Query(graphene.ObjectType):
@@ -401,21 +381,10 @@ class Query(graphene.ObjectType):
             else:
                 community = Community.objects.get(name=name)
 
-            user_id = None
-            if info.context.user is not None:
-                user_id = info.context.user['id']
-
-            if community.is_public or (user_id and community.is_member(user_id)) or (user_id and community.is_owner(user_id)):
-                return CommunityResponse(
-                    success=True,
-                    message="Community retrieved successfully",
-                    community=community
-                )
-
             return CommunityResponse(
-                success=False,
-                message="You don't have access to this community",
-                community=None
+                success=True,
+                message="Community retrieved successfully",
+                community=community
             )
         except Community.DoesNotExist:
             return CommunityResponse(
@@ -435,11 +404,6 @@ class Query(graphene.ObjectType):
             if filter:
                 if filter.name:
                     queryset = queryset.filter(Q(name__icontains=filter.name))
-
-                if filter.community_status == CommunityStatus.PUBLIC:
-                    queryset = queryset.filter(is_public=True)
-                elif filter.community_status == CommunityStatus.PRIVATE:
-                    queryset = queryset.filter(is_public=False)
 
                 if filter.membership_type == CommunityMembershipType.MEMBER and user_id:
                     queryset = queryset.filter(

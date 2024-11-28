@@ -21,7 +21,6 @@ const CommunityContext = createContext<CommunityContext>({
     id: '',
     isMember: false,
     isOwner: false,
-    isPublic: false,
     memberCount: 0,
     name: '',
     ownerId: '',

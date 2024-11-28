@@ -63,12 +63,6 @@ export const communityDescriptionSchema = z.object({
 
 export type CommunityDescriptionInput = z.infer<typeof communityDescriptionSchema>
 
-export const communityStatusSchema = z.object({
-  isPublic: z.boolean(),
-})
-
-export type CommunityStatusInput = z.infer<typeof communityStatusSchema>
-
 export const deleteCommunitySchema = z.object({
   name: z.string(),
 })

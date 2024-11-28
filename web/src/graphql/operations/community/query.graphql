@@ -8,7 +8,6 @@ query Community($id: ID, $name: String) {
       title
       description
       dateCreated
-      isPublic
       ownerId
       icon
       banner
@@ -31,7 +30,6 @@ query Communities($filter: CommunitiesFilter) {
       title
       description
       dateCreated
-      isPublic
       ownerId
       icon
       banner

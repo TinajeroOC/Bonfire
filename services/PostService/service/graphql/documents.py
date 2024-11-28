@@ -7,11 +7,10 @@ community_document = gql(
             success
             message
             community {
-              id
-              name
-              isOwner
-              isMember
-              isPublic
+                id
+                name
+                isOwner
+                isMember
             }
         }
     }
@@ -24,13 +23,13 @@ comments_document = gql(
             success
             message
             comments {
-            id
-            body
-            postId
-            commenterId
-            updatedAt
-            createdAt
-            isCommenter
+                id
+                body
+                postId
+                commenterId
+                updatedAt
+                createdAt
+                isCommenter
             }
         }
     }

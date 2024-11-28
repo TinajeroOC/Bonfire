@@ -2,7 +2,7 @@
 
 import { useMutation } from '@apollo/client'
 import dateFormat from 'dateformat'
-import { Cake, Globe, Loader2, Users } from 'lucide-react'
+import { Cake, Loader2, Users } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
@@ -143,10 +143,6 @@ export function CommunityInformationCard({
       )}
       <CardSeparator />
       <CardContent className='flex flex-col gap-2 pt-6'>
-        <span className='flex items-center gap-2 text-sm font-light text-muted-foreground'>
-          <Globe className='h-4 w-4 text-muted-foreground' />
-          {community.isPublic ? 'Public' : 'Private'}
-        </span>
         <span className='flex items-center gap-2 text-sm font-light text-muted-foreground'>
           <Users className='h-4 w-4 text-muted-foreground' />
           {`${memberCount} ${memberCount === 1 ? 'Member' : 'Members'}`}

@@ -3,12 +3,10 @@ import Link from 'next/link'
 import { BackButton } from '@/components/buttons/BackButton'
 import { CommunityDateCard } from '@/components/cards/CommunityDateCard'
 import { CommunityMemberCountCard } from '@/components/cards/CommunityMemberCountCard'
-import { CommunityStatusCard } from '@/components/cards/CommunityStatusCard'
 import { DeleteCommunityModal } from '@/components/modals/DeleteCommunityModal'
 import { UpdateCommunityBannerModal } from '@/components/modals/UpdateCommunityBannerModal'
 import { UpdateCommunityDescriptionModal } from '@/components/modals/UpdateCommunityDescriptionModal'
 import { UpdateCommunityIconModal } from '@/components/modals/UpdateCommunityIconModal'
-import { UpdateCommunityStatusModal } from '@/components/modals/UpdateCommunityStatusModal'
 import { UpdateCommunityTitleModal } from '@/components/modals/UpdateCommunityTitleModal'
 import { CommunityProvider } from '@/components/providers/CommunityProvider'
 import { CommunityDocument } from '@/graphql/__generated__/operations'
@@ -54,7 +52,6 @@ export default async function CommunityPage({ params }: CommunityPageProps) {
                 Overview
               </h2>
               <div className='flex w-full flex-col gap-2 md:flex-row'>
-                <CommunityStatusCard />
                 <CommunityMemberCountCard
                   memberCount={communityData.community.community.memberCount}
                 />
@@ -67,7 +64,6 @@ export default async function CommunityPage({ params }: CommunityPageProps) {
               <UpdateCommunityBannerModal />
               <UpdateCommunityTitleModal />
               <UpdateCommunityDescriptionModal />
-              <UpdateCommunityStatusModal />
               <DeleteCommunityModal />
             </div>
           </div>

@@ -15,7 +15,6 @@ export default async function DiscoverPage() {
     variables: {
       filter: {
         membershipType: 'NON_MEMBER',
-        communityStatus: 'PUBLIC',
       },
     },
   })

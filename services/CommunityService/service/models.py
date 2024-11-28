@@ -21,7 +21,6 @@ class Community(models.Model):
         3, message="Title must be at least 3 characters long")])
     description = models.TextField(max_length=500)
     date_created = models.DateTimeField(auto_now_add=True)
-    is_public = models.BooleanField(default=True)
     owner_id = models.CharField(max_length=255)
     icon = models.ImageField(
         upload_to=community_directory_path,

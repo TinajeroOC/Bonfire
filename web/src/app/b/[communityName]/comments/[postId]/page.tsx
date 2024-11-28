@@ -51,34 +51,20 @@ export default async function CommentsPage({ params }: CommentsPageProps) {
       <div className='flex flex-col-reverse gap-4 md:flex-row'>
         <main className='max-w-3xl flex-grow'>
           <BackButton />
-          {communityData.community.community.isPublic ||
-          communityData.community.community.isOwner ? (
-            <>
-              <PostProvider post={postData.post.post}>
-                <PostContainer community={communityData.community.community} />
-              </PostProvider>
-              <Separator />
-              <CommentsProvider comments={postData.post.post.comments ?? []}>
-                {session && (
-                  <div className='mt-4'>
-                    <CreateCommentForm />
-                  </div>
-                )}
-                <div className='mt-2'>
-                  <CommentsContainer />
-                </div>
-              </CommentsProvider>
-            </>
-          ) : (
-            <>
-              <div className='flex h-full flex-col items-center justify-center gap-2'>
-                <h3 className='font-bold'>Community is Private</h3>
-                <p className='text-sm font-light text-muted-foreground'>
-                  The owner has privated this community
-                </p>
+          <PostProvider post={postData.post.post}>
+            <PostContainer community={communityData.community.community} />
+          </PostProvider>
+          <Separator />
+          <CommentsProvider comments={postData.post.post.comments ?? []}>
+            {session && (
+              <div className='mt-4'>
+                <CreateCommentForm />
               </div>
-            </>
-          )}
+            )}
+            <div className='mt-2'>
+              <CommentsContainer />
+            </div>
+          </CommentsProvider>
         </main>
         <aside className='w-full md:max-w-xs'>
           <CommunityProvider community={communityData.community.community}>
