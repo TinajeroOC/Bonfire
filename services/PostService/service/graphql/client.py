@@ -47,18 +47,18 @@ def get_comment_service_client(token=None):
 
 def get_comment_service_server_client():
     api_url = os.getenv('COMMENT_SERVICE_API_URL')
-    server_secret_key = os.getenv('SERVER_SECRET_KEY')
+    api_server_secret_key = os.getenv('API_SERVER_SECRET_KEY')
 
     if not api_url:
         raise ValueError(
             "COMMENT_SERVICE_API_URL not set in environment variables")
 
-    if not server_secret_key:
+    if not api_server_secret_key:
         raise ValueError(
-            "SERVER_SECRET_KEY not set in environment variables")
+            "API_SERVER_SECRET_KEY not set in environment variables")
 
     headers = {}
-    headers['X-Server-Secret'] = server_secret_key
+    headers['X-Server-Secret'] = api_server_secret_key
 
     transport = RequestsHTTPTransport(
         url=api_url,

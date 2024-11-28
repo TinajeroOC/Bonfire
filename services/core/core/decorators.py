@@ -2,7 +2,7 @@ from functools import wraps
 import os
 from graphql import GraphQLError
 
-server_secret_key = os.getenv('SERVER_SECRET_KEY')
+api_server_secret_key = os.getenv('API_SERVER_SECRET_KEY')
 
 
 def login_required(func):
@@ -19,7 +19,7 @@ def server_only(func):
     def wrapper(cls, info, *args, **kwargs):
         request_secret_key = info.context.headers.get('X-Server-Secret')
 
-        if request_secret_key == server_secret_key:
+        if request_secret_key == api_server_secret_key:
             return func(cls, info, *args, **kwargs)
 
         raise GraphQLError('Server only')

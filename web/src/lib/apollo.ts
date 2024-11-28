@@ -25,7 +25,7 @@ export const { getClient: getApolloClient } = registerApolloClient(() => {
     link: ApolloLink.from([
       authLink,
       new HttpLink({
-        uri: process.env.NEXT_PUBLIC_APOLLO_SERVER_URI,
+        uri: process.env.NEXT_PUBLIC_APOLLO_SERVER_URL,
       }),
     ]),
   })

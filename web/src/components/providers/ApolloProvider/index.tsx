@@ -23,7 +23,7 @@ function makeClient() {
   })
 
   const uploadLink = createUploadLink({
-    uri: process.env.NEXT_PUBLIC_APOLLO_SERVER_URI,
+    uri: process.env.NEXT_PUBLIC_APOLLO_SERVER_URL,
     headers: { 'Apollo-Require-Preflight': 'true' },
   })
 
