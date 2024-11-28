@@ -1,3 +1,5 @@
+import { Fragment } from 'react'
+
 import { FeedPostCard } from '@/components/cards/FeedPostCard'
 import { Separator } from '@/components/ui/Separator'
 import { FeedPostsDocument } from '@/graphql/__generated__/operations'
@@ -18,13 +20,13 @@ export default async function FeedPage() {
     <div className='mx-auto w-full max-w-6xl p-6'>
       <main>
         <div className='flex flex-col gap-2'>
-          {postsData.posts?.posts?.map((post, index) => (
-            <>
-              <article key={`post-${index}`}>
+          {postsData.posts?.posts?.map((post) => (
+            <Fragment key={post.id}>
+              <article>
                 <FeedPostCard post={post} />
               </article>
-              <Separator key={`sep-${index}`} />
-            </>
+              <Separator />
+            </Fragment>
           ))}
         </div>
       </main>

@@ -2,10 +2,10 @@
 
 import { useMutation } from '@apollo/client'
 import { Loader2 } from 'lucide-react'
-import { useParams, useRouter } from 'next/navigation'
 import { useState } from 'react'
 
-import { usePostContext } from '@/components/providers/PostProvider'
+import { useCommentIdContext } from '@/components/providers/CommentIdProvider'
+import { useCommentsContext } from '@/components/providers/CommentsProvider'
 import { Button } from '@/components/ui/Button'
 import {
   Modal,
@@ -16,27 +16,26 @@ import {
   ModalTitle,
   ModalTrigger,
 } from '@/components/ui/Modal'
-import { DeletePostDocument } from '@/graphql/__generated__/operations'
+import { DeleteCommentDocument } from '@/graphql/__generated__/operations'
 import { useToast } from '@/hooks/use-toast'
 
-export function DeletePostModal() {
-  const [deletePost, { loading }] = useMutation(DeletePostDocument)
-  const router = useRouter()
-  const params = useParams()
+export function DeleteCommentModal() {
+  const [deleteComment, { loading }] = useMutation(DeleteCommentDocument)
   const [open, setOpen] = useState(false)
-  const { post } = usePostContext()
+  const { id } = useCommentIdContext()
+  const { dispatch } = useCommentsContext()
   const { toast } = useToast()
 
-  const handleDeletePost = async () => {
-    const { data: deletePostData } = await deletePost({
+  const handleDeleteComment = async () => {
+    const { data: deleteCommentData } = await deleteComment({
       variables: {
-        postId: post.id,
+        commentId: id,
       },
     })
 
-    if (!deletePostData?.deletePost?.success) {
+    if (!deleteCommentData?.deleteComment?.success) {
       toast({
-        title: 'There was an issue deleting the post',
+        title: 'There was an issue deleting the comment',
         description: 'Contact us if this issue persists',
         variant: 'destructive',
       })
@@ -44,7 +43,10 @@ export function DeletePostModal() {
 
     setOpen(false)
 
-    router.push(`/b/${params.communityName}`)
+    dispatch({
+      type: 'deleted',
+      id,
+    })
   }
 
   return (
@@ -56,17 +58,17 @@ export function DeletePostModal() {
       </ModalTrigger>
       <ModalContent className='max-w-xl'>
         <ModalHeader>
-          <ModalTitle>Delete Post</ModalTitle>
+          <ModalTitle>Delete Comment</ModalTitle>
           <ModalDescription>
-            This action cannot be reversed. By deleting this post, all of its data will be removed
-            from our servers
+            This action cannot be reversed. By deleting this comment, all of its data will be
+            removed from our servers
           </ModalDescription>
         </ModalHeader>
         <ModalFooter>
           <Button variant='secondary' onClick={() => setOpen(false)}>
             Cancel
           </Button>
-          <Button variant='destructive' disabled={loading} onClick={handleDeletePost}>
+          <Button variant='destructive' disabled={loading} onClick={handleDeleteComment}>
             {loading && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
             Delete
           </Button>

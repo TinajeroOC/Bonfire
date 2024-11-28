@@ -3,7 +3,10 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import { BackButton } from '@/components/buttons/BackButton'
 import { CommunityInformationCard } from '@/components/cards/CommunityInformationCard'
+import { CommentsContainer } from '@/components/containers/CommentsContainer'
 import { PostContainer } from '@/components/containers/PostContainer'
+import { CreateCommentForm } from '@/components/forms/CreateCommentForm'
+import { CommentsProvider } from '@/components/providers/CommentsProvider'
 import { CommunityProvider } from '@/components/providers/CommunityProvider'
 import { PostProvider } from '@/components/providers/PostProvider'
 import { Separator } from '@/components/ui/Separator'
@@ -48,10 +51,34 @@ export default async function CommentsPage({ params }: CommentsPageProps) {
       <div className='flex flex-col-reverse gap-4 md:flex-row'>
         <main className='max-w-3xl flex-grow'>
           <BackButton />
-          <PostProvider post={postData.post.post}>
-            <PostContainer community={communityData.community.community} />
-          </PostProvider>
-          <Separator />
+          {communityData.community.community.isPublic ||
+          communityData.community.community.isOwner ? (
+            <>
+              <PostProvider post={postData.post.post}>
+                <PostContainer community={communityData.community.community} />
+              </PostProvider>
+              <Separator />
+              <CommentsProvider comments={postData.post.post.comments ?? []}>
+                {session && (
+                  <div className='mt-4'>
+                    <CreateCommentForm />
+                  </div>
+                )}
+                <div className='mt-2'>
+                  <CommentsContainer />
+                </div>
+              </CommentsProvider>
+            </>
+          ) : (
+            <>
+              <div className='flex h-full flex-col items-center justify-center gap-2'>
+                <h3 className='font-bold'>Community is Private</h3>
+                <p className='text-sm font-light text-muted-foreground'>
+                  The owner has privated this community
+                </p>
+              </div>
+            </>
+          )}
         </main>
         <aside className='w-full md:max-w-xs'>
           <CommunityProvider community={communityData.community.community}>

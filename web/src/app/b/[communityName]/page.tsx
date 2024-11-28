@@ -1,4 +1,5 @@
 import { getServerSession } from 'next-auth'
+import { Fragment } from 'react'
 
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import { CommunityHeaderCard } from '@/components/cards/CommunityHeaderCard'
@@ -50,13 +51,13 @@ export default async function CommunityPage({ params }: CommunityPageProps) {
           {communityData.community.community.isPublic ||
           communityData.community.community.isOwner ? (
             <div className='flex flex-col gap-2'>
-              {postsData.posts?.posts?.map((post, index) => (
-                <>
-                  <article key={`post-${index}`}>
+              {postsData.posts?.posts?.map((post) => (
+                <Fragment key={post.id}>
+                  <article>
                     <CommunityPostCard communityName={communityName} post={post} />
                   </article>
-                  <Separator key={`sep-${index}`} />
-                </>
+                  <Separator />
+                </Fragment>
               ))}
             </div>
           ) : (
