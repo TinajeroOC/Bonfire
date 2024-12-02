@@ -7,10 +7,30 @@ Bonfire is a social media platform where users can post, react, and comment in c
 ## Group Members
 
 1. Esteban Tinajero
-
 2. Michael Duenas
-
 3. Qianqian Ke
+
+## Tech Stack
+
+**Frontend**
+
+- Framework: Next.js
+- Language: TypeScript
+- Styling: Tailwind CSS & NyxbUI
+
+**Backend**
+
+- Framework: Django (per microservice)
+- Language: Python
+- API: GraphQL w/ Apollo Server
+
+**Database**
+
+- Database Management System: PostgreSQL
+
+## Architecture
+
+![Architecture](https://i.imgur.com/tgxhF3d_d.webp?maxwidth=760&fidelity=grand)
 
 ## Requirements
 
