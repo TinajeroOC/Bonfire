@@ -32,6 +32,10 @@ Bonfire is a social media platform where users can post, react, and comment in c
 
 ![Architecture](https://i.imgur.com/tgxhF3d_d.webp?maxwidth=760&fidelity=grand)
 
+## Demo
+
+![Video](https://drive.google.com/file/d/1fI5XPpf9ovtbofYEogMHGb0yVjsFDmRe/view?usp=sharing)
+
 ## Requirements
 
 1. Python (Version 3.12 or higher) ([Download](https://www.python.org/downloads/))
