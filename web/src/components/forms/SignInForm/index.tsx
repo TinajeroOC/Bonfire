@@ -5,7 +5,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { ChevronRight, CircleAlert, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { signIn } from 'next-auth/react'
-import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/Alert'
@@ -24,7 +23,6 @@ import { CommunitiesDocument } from '@/graphql/__generated__/operations'
 import { SignInInput, signInSchema } from '@/lib/validations/auth'
 
 export function SignInForm() {
-  const [loading, setLoading] = useState<boolean>(false)
   const apolloClient = useApolloClient()
   const router = useRouter()
   const form = useForm<SignInInput>({
@@ -36,8 +34,6 @@ export function SignInForm() {
   })
 
   const onSubmit: SubmitHandler<SignInInput> = async ({ username, password }) => {
-    setLoading(true)
-
     try {
       const response = await signIn('credentials', {
         redirect: false,
@@ -56,8 +52,6 @@ export function SignInForm() {
       router.refresh()
     } catch (error) {
       form.setError('root', { message: (error as Error).message })
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -103,8 +97,8 @@ export function SignInForm() {
           )}
         />
         <div className='pt-2'>
-          <Button disabled={loading} type='submit' className='w-full'>
-            {loading && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
+          <Button disabled={form.formState.isSubmitting} type='submit' className='w-full'>
+            {form.formState.isSubmitting && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
             Sign In
             <ChevronRight className='ml-[2px] mt-[0.5px] h-4 w-4' />
           </Button>
