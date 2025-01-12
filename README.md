@@ -2,13 +2,7 @@
 
 ## Overview
 
-Bonfire is a social media platform where users can post, react, and comment in communities based on shared interests.
-
-## Group Members
-
-1. Esteban Tinajero
-2. Michael Duenas
-3. Qianqian Ke
+Bonfire is a social media platform where users can post and comment in communities based on shared interests.
 
 ## Tech Stack
 
@@ -31,10 +25,6 @@ Bonfire is a social media platform where users can post, react, and comment in c
 ## Architecture
 
 ![Architecture](https://i.imgur.com/tgxhF3d_d.webp?maxwidth=760&fidelity=grand)
-
-## Demo
-
-![Video](https://drive.google.com/file/d/1fI5XPpf9ovtbofYEogMHGb0yVjsFDmRe/view?usp=sharing)
 
 ## Requirements
 
